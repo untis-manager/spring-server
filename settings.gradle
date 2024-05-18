@@ -1,0 +1,17 @@
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.5.0'
+}
+rootProject.name = 'untis-server'
+
+include 'database'
+include 'application'
+include 'model'
+include 'mail'
+include 'common'
+include 'service'
+include 'common-test'
+include 'controller'
+include 'domain'
+include 'security'
+include 'attachment-store'
+

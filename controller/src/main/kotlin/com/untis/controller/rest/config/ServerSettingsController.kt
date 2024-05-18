@@ -1,0 +1,74 @@
+package com.untis.controller.rest.config
+
+import com.untis.controller.base.ControllerScope
+import com.untis.controller.body.request.settings.UpdateSignUpModeRequest
+import com.untis.controller.body.response.SignUpModeResponse
+import com.untis.controller.validating.validateRoleExists
+import com.untis.model.SignUpMode
+import com.untis.model.exception.RequestException
+import com.untis.service.RoleService
+import com.untis.service.ServerSettingsService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.bind.annotation.*
+
+/**
+ * Access to the server settings
+ */
+@RestController
+@RequestMapping("/server-config")
+class ServerSettingsController @Autowired constructor(
+
+    val serverSettingsService: ServerSettingsService,
+
+    override val roleService: RoleService
+
+) : ControllerScope() {
+
+    /**
+     * Endpoint that returns information about the currently active sign up mode
+     *
+     * @return The sign-up mode
+     */
+    @GetMapping("/signup-mode/")
+    fun signUpMode(): SignUpModeResponse = serverSettingsService
+        .get().signUpMode
+        .let(SignUpModeResponse::create)
+
+    /**
+     * Endpoint that changes the currently active sign up mode
+     *
+     * @param requestBody The information about the new sign-up mode
+     * @return The sign-up mode
+     */
+    @PatchMapping("/signup-mode/")
+    fun updateSignUpMode(
+        @RequestBody requestBody: UpdateSignUpModeRequest
+    ): SignUpModeResponse {
+        requestBody.validate()
+
+        val signUpMode = when (requestBody.mode) {
+            SignUpMode.Names.Admin -> SignUpMode.Admin
+            SignUpMode.Names.Token -> SignUpMode.Token
+            SignUpMode.Names.Free -> SignUpMode.Free(requestBody.defaultRoleId!!, requestBody.emailVerification!!)
+            else -> throw IllegalStateException()
+        }
+
+        val serverSettings = serverSettingsService.get()
+        val updated = serverSettings.copy(
+            signUpMode = signUpMode
+        )
+
+        serverSettingsService.set(updated)
+        return SignUpModeResponse.create(signUpMode)
+    }
+
+    private fun UpdateSignUpModeRequest.validate() {
+        if (mode !in SignUpMode.Names.all()) throw RequestException.ParamsBad("Unknown sign-up-mode: '$mode'")
+
+        if (mode == SignUpMode.Names.Free) {
+            if (emailVerification == null || defaultRoleId == null) throw RequestException.ParamsBad("For sign up mode '$mode', 'emailVerification' and 'defaultRoleId' must be passed.")
+            validateRoleExists(defaultRoleId)
+        }
+    }
+
+}
