@@ -60,15 +60,6 @@ class UserEntity (
     var birthday: LocalDate? = null,
 
     /*
-    Role
-     */
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    var role: RoleEntity? = null,
-
-    /*
     Groups
      */
     @ManyToMany(fetch = FetchType.EAGER)

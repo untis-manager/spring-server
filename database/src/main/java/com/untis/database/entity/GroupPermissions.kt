@@ -3,19 +3,15 @@ package com.untis.database.entity
 import jakarta.persistence.*
 
 /**
- * A role inside the whole system, applied to a specific user.
- * States the role of the user compared to others and is used for authentication and allowed actions.
+ * A record that describes the authorities that a certain group is given.
  */
-@Entity(name = "roles")
-@Table(name = "roles")
-class RoleEntity (
+@Entity(name = "permissions")
+@Table(name = "permissions")
+class GroupPermissions (
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     var id: Long? = null,
-
-    @Column(name = "name", nullable = false)
-    var name: String? = null,
 
     /*
     Permissions
