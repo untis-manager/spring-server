@@ -3,7 +3,7 @@ package com.untis.controller.rest.user
 import com.untis.controller.base.ControllerScope
 import com.untis.controller.body.request.personal.EditProfileRequest
 import com.untis.controller.body.response.FullUserResponse
-import com.untis.controller.body.response.RoleResponse
+import com.untis.controller.body.response.PermissionBundleResponse
 import com.untis.controller.validating.validateGenderString
 import com.untis.controller.validating.validateLocalDate
 import com.untis.model.AddressInfo
@@ -85,14 +85,14 @@ class PersonalUserController @Autowired constructor(
     }
 
     /**
-     * Endpoint that return the role information for the authenticated user
+     * Endpoint that return the permissions of the user
      *
      * @param user The authenticated user
-     * @return The role
+     * @return The permissions
      */
-    @GetMapping("/role/")
-    fun getRole(
+    @GetMapping("/permissions/")
+    fun getPermissions(
         @AuthenticationPrincipal user: User
-    ): RoleResponse = RoleResponse.create(user.role)
+    ): PermissionBundleResponse = PermissionBundleResponse.create(user.permissions)
 
 }
