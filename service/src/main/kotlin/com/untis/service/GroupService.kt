@@ -27,6 +27,14 @@ interface GroupService : BaseService<Group> {
     fun getParentGroup(id: Long): Group?
 
     /**
+     * Gets the parent groups of the group.
+     *
+     * @param id The id of the group to get the parent groups of
+     * @return The parent groups. Also contains the group itself.
+     */
+    fun getParentGroups(id: Long): List<Group>
+
+    /**
      * Gets the groups that are children of a specific group
      *
      * @param id The id of the group to get the children of

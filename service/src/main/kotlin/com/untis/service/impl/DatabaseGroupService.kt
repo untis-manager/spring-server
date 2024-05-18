@@ -39,10 +39,18 @@ internal class DatabaseGroupService @Autowired constructor(
     override fun getByIdAndUser(id: Long, user: Long): Group? = groupRepository
         .findById(id).orElse(null)
         ?.let { group ->
-            val userEntity = userRepository.findById(user).get()
-            if (userEntity.groups?.any { it.id == group.id } == true) group else null
+            if (userInGroup(user, id)) group
+            else null
         }
         ?.let(::createGroupModel)
+
+    // Checks also for indirect
+    private fun userInGroup(groupId: Long, userId: Long): Boolean {
+        val user = userRepository.findById(userId).get()
+        val children = groupRepository.getChildrenGroups(groupId).map { it.id!! }
+
+        return user.groups!!.any { it.id == groupId || it.id in children }
+    }
 
     override fun getAllForUser(user: Long): List<Group> = groupRepository
         .getGroupsForUser(user)
@@ -68,6 +76,11 @@ internal class DatabaseGroupService @Autowired constructor(
             .findById(id).get()
             .parentGroup
             ?.let(::createGroupModel)
+
+    override fun getParentGroups(id: Long): List<Group> =
+        groupRepository
+            .getParentGroups(id)
+            .map(::createGroupModel)
 
     override fun getDirectChildrenGroups(id: Long): Set<Group> =
         groupRepository
