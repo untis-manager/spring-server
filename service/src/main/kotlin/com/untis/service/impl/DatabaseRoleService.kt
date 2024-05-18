@@ -2,8 +2,7 @@ package com.untis.service.impl
 
 import com.untis.database.repository.RoleRepository
 import com.untis.database.repository.UserRepository
-import com.untis.model.Role
-import com.untis.model.UserPermissions
+import com.untis.model.PermissionsBundle
 import com.untis.service.RoleService
 import com.untis.service.mapping.createRoleEntity
 import com.untis.service.mapping.createRoleModel
@@ -78,7 +77,7 @@ internal class DatabaseRoleService @Autowired constructor(
         val role = Role(
             id = null,
             name = "admin",
-            permissions = UserPermissions.Admin
+            permissions = PermissionsBundle.Admin
         )
 
         val roleEntity = createRoleEntity(role)

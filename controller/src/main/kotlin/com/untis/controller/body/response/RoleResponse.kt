@@ -1,7 +1,5 @@
 package com.untis.controller.body.response
 
-import com.untis.model.Role
-
 data class RoleResponse(
 
     val id: Long,

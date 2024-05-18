@@ -3,7 +3,7 @@ package com.untis.model
 /**
  * Contain all permissions of a user over different scopes
  */
-data class UserPermissions(
+data class PermissionsBundle(
 
     /**
      * Permission to interact with other users
@@ -59,7 +59,7 @@ data class UserPermissions(
 
     companion object {
 
-        val Admin = UserPermissions(
+        val Admin = PermissionsBundle(
             users = Permission.Users.Edit,
             profile = Permission.Profile.Edit,
             courses = Permission.Scoped.Edit,

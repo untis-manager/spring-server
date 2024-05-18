@@ -2,8 +2,7 @@ package com.untis.service.mapping
 
 import com.untis.database.entity.RoleEntity
 import com.untis.model.Permission
-import com.untis.model.Role
-import com.untis.model.UserPermissions
+import com.untis.model.PermissionsBundle
 
 internal fun createRoleModel(entity: RoleEntity): Role = Role(
     id = entity.id!!,
@@ -11,7 +10,7 @@ internal fun createRoleModel(entity: RoleEntity): Role = Role(
     permissions = entity.extractUserPermissions()
 )
 
-internal fun RoleEntity.extractUserPermissions(): UserPermissions = UserPermissions(
+internal fun RoleEntity.extractUserPermissions(): PermissionsBundle = UserPermissions(
     users = Permission.Users.create(permissionUsers!!),
     profile = Permission.Profile.create(permissionProfile!!),
     roles = Permission.Scoped.create(permissionRoles!!),

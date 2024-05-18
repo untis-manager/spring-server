@@ -1,6 +1,5 @@
 package com.untis.service
 
-import com.untis.model.Role
 import com.untis.model.User
 import com.untis.service.base.BaseService
 
