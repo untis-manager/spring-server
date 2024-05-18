@@ -11,7 +11,7 @@ sealed class Permission(
 
     open val maxStage: Int
 
-) {
+) : Comparable<Permission> {
 
     /**
      * Simple permission: User can either only read or read and write
@@ -205,5 +205,10 @@ sealed class Permission(
      * @return The authorities in the format 'SCOPE_STAGE'
      */
     fun authoritiesUpwards(name: String): List<String> = (stage..maxStage).map { "${name}_$it" }
+
+    override fun compareTo(other: Permission) =
+        if (this.stage > other.stage) 1
+    else if (this.stage < other.stage) -1
+    else 0
 
 }

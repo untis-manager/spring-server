@@ -24,7 +24,7 @@ class GroupEntity(
         mappedBy = "permissions_id",
         optional = false
     )
-    var permissions: GroupPermissions? = null,
+    var permissions: GroupPermissionsEntity? = null,
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_group_id", nullable = true)

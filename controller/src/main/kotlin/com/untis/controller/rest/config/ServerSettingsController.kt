@@ -6,7 +6,6 @@ import com.untis.controller.body.response.SignUpModeResponse
 import com.untis.controller.validating.validateRoleExists
 import com.untis.model.SignUpMode
 import com.untis.model.exception.RequestException
-import com.untis.service.RoleService
 import com.untis.service.ServerSettingsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*

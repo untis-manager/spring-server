@@ -17,4 +17,10 @@ interface GroupRepository : SimpleRepository<GroupEntity> {
 
     fun getCoursesForGroup(groupId: Long): List<CourseEntity>
 
+    fun getParentGroups(id: Long): List<GroupEntity>
+
+    fun getParentGroups(ids: List<Long>): List<GroupEntity>
+
+    fun getChildrenGroups(id: Long): List<GroupEntity>
+
 }

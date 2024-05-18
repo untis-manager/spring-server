@@ -11,7 +11,7 @@ internal class DatabaseCourseRepository @Autowired constructor(
     private val delegate: CourseCrudRepository
 ) : CourseRepository {
 
-    override fun getAllForUser(userId: Long) = delegate.getAllForUser(userId)
+    override fun getForGroups(groupIds: List<Long>) = delegate.getForGroupId(groupIds)
 
     override fun save(entity: CourseEntity) = delegate.save(entity)
 

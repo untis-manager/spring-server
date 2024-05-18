@@ -1,12 +1,11 @@
 package com.untis.service.impl
 
-import com.untis.database.entity.GroupEntity
 import com.untis.database.repository.CourseRepository
 import com.untis.database.repository.GroupRepository
-import com.untis.database.repository.RoleRepository
 import com.untis.database.repository.UserRepository
 import com.untis.model.Course
 import com.untis.model.User
+import com.untis.service.GroupService
 import com.untis.service.UserService
 import com.untis.service.mapping.createCourseModel
 import com.untis.service.mapping.createGroupModel
@@ -20,21 +19,29 @@ internal class DatabaseUserService @Autowired constructor(
 
     val userRepository: UserRepository,
 
-    val roleRepository: RoleRepository,
-
     val courseRepository: CourseRepository,
 
-    val groupRepository: GroupRepository
+    val groupRepository: GroupRepository,
+
+    val groupService: GroupService
 ) : UserService {
 
     override fun getAll(): Set<User> = userRepository
         .findAll()
-        .map(::createUserModel)
+        .map { user ->
+            val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+            createUserModel(user, perms)
+        }
         .toSet()
 
     override fun getById(id: Long): User = userRepository
         .findById(id).get()
-        .let(::createUserModel)
+        .let { user ->
+            val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+            createUserModel(user, perms)
+        }
 
     override fun getByIdAndUser(id: Long, user: Long): User? {
         throw NotImplementedError("Can't get a user specific to a user")
@@ -46,17 +53,24 @@ internal class DatabaseUserService @Autowired constructor(
 
     override fun getByEmail(email: String): User? = userRepository
         .getByEmail(email).orElse(null)
-        ?.let(::createUserModel)
+        ?.let { user ->
+            val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
 
-    override fun getByRole(roleId: Long): Set<User> = userRepository
-        .getByRole(roleId)
-        .map(::createUserModel)
-        .toSet()
+            createUserModel(user, perms)
+        }
 
-    override fun getInGroup(groupId: Long): Set<User> = userRepository
-        .getUsersInGroup(groupId)
-        .map(::createUserModel)
-        .toSet()
+    override fun getInGroup(groupId: Long): Set<User> {
+        val groups = groupRepository.getChildrenGroups(groupId)
+
+        return userRepository
+            .getUsersInGroups(groups.map { it.id!! })
+            .map { user ->
+                val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+                createUserModel(user, perms)
+            }
+            .toSet()
+    }
 
     override fun existsById(id: Long): Boolean = userRepository
         .findById(id)
@@ -64,45 +78,53 @@ internal class DatabaseUserService @Autowired constructor(
 
     override fun getEnrolledCourses(
         id: Long
-    ) = courseRepository
-        .getAllForUser(id)
-        .map(::createCourseModel)
-        .toSet()
+    ): Set<Course> {
+        val groupsUser = userRepository.findById(id).get().groups!!
+        val groups = groupRepository.getParentGroups(groupsUser.map { it.id!! })
+
+        return courseRepository.getForGroups(groups.map { it.id!! })
+            .map(::createCourseModel)
+            .toSet()
+    }
+
+    override fun create(user: User, groupId: Long): User {
+        val group = groupRepository.findById(groupId).get()
+        val permissions = groupService.getMergedPermissions(group.id!!)
+
+        val entity = createUserEntity(
+            model = user,
+            groupEntities = setOf(group)
+        )
+
+        return createUserModel(entity, permissions)
+    }
 
     override fun create(model: User): User {
-        val role = roleRepository.findById(model.role.id!!).get()
-
-        val entity = createUserEntity(model, role, emptySet())
-
-        return userRepository
-            .save(entity)
-            .let(::createUserModel)
+        throw IllegalStateException("Use the overload with the 'courseId' parameter")
     }
 
     override fun delete(id: Long): User = userRepository
         .findById(id).get()
         .apply(userRepository::delete)
-        .let(::createUserModel)
+        .let { user ->
+            val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+            createUserModel(user, perms)
+        }
 
     override fun update(user: User): User {
         if (!userRepository.existsById(user.id!!)) throw IllegalStateException("User with id '${user.id}' not found")
 
-        val role = userRepository.findById(user.id!!).get().role!!
         val groups = userRepository.findById(user.id!!).get().groups!!
 
-        return createUserEntity(user, role, groups)
+        return createUserEntity(user, groups)
             .let(userRepository::save)
-            .let(::createUserModel)
-    }
+            .let { user ->
+                val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
 
-    override fun addToGroup(groupId: Long, userId: Long) = groupRepository
-        .findById(groupId).get()
-        .let { group ->
-            userRepository
-                .findById(userId).get()
-                .apply { groups?.add(group) }
-                .let(userRepository::save)
-        }.let(::createUserModel)
+                createUserModel(user, perms)
+            }
+    }
 
     override fun updateGroups(userId: Long, groupIds: Set<Long>) = groupRepository
         .findAllById(groupIds.toList())

@@ -48,7 +48,7 @@ data class User(
     val gender: GenderInfo,
 
     /**
-     * The permissions that the user is given by the groups it is part of.
+     * The ultimate permissions that the user is given by the groups it is part of.
      */
     val permissions: PermissionsBundle
 

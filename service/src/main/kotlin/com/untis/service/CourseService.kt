@@ -43,6 +43,14 @@ interface CourseService: BaseService<Course> {
     fun updateTimings(id: Long, timings: List<CourseTiming>)
 
     /**
+     * Gets all courses belonging to the group, or the parents of each group
+     *
+     * @param groupId The id of the group
+     * @return All courses for the group or for the parents of that group
+     */
+    fun getAllForGroup(groupId: Long): List<Course>
+
+    /**
      * Gets the leaders of a course
      *
      * @param id The id of the course

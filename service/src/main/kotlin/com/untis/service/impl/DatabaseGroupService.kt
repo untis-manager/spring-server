@@ -2,14 +2,15 @@ package com.untis.service.impl
 
 import com.untis.database.entity.GroupEntity
 import com.untis.database.repository.CourseRepository
+import com.untis.database.repository.GroupPermissionsRepository
 import com.untis.database.repository.GroupRepository
 import com.untis.database.repository.UserRepository
+import com.untis.model.Course
 import com.untis.model.Group
+import com.untis.model.PermissionsBundle
+import com.untis.model.User
 import com.untis.service.GroupService
-import com.untis.service.mapping.createCourseModel
-import com.untis.service.mapping.createGroupEntity
-import com.untis.service.mapping.createGroupModel
-import com.untis.service.mapping.createUserModel
+import com.untis.service.mapping.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -20,8 +21,9 @@ internal class DatabaseGroupService @Autowired constructor(
 
     val userRepository: UserRepository,
 
-    val courseRepository: CourseRepository
+    val courseRepository: CourseRepository,
 
+    val groupPermissionsRepository: GroupPermissionsRepository
 ) : GroupService {
 
     override fun getAll() = groupRepository
@@ -47,14 +49,70 @@ internal class DatabaseGroupService @Autowired constructor(
         .map(::createGroupModel)
 
 
-    override fun getUsers(id: Long) = userRepository
-        .getUsersInGroup(id)
-        .map(::createUserModel).toSet()
+    override fun getUsers(id: Long): Set<User> {
+        val groups = groupRepository.getChildrenGroups(id)
+        val usersPerGroup = groups.map { userRepository.getUsersInGroups(listOf(it.id!!)) }
+        return usersPerGroup
+            .flatten()
+            .distinctBy { it.id!! }
+            .map { user ->
+                val perms = getMergedPermissions(user.groups!!.map { it.id!! })
+
+                createUserModel(user, perms)
+            }
+            .toSet()
+    }
+
+    override fun getParentGroup(id: Long): Group? =
+        groupRepository
+            .findById(id).get()
+            .parentGroup
+            ?.let(::createGroupModel)
+
+    override fun getDirectChildrenGroups(id: Long): Set<Group> =
+        groupRepository
+            .findById(id).get()
+            .directChildrenGroups!!
+            .map(::createGroupModel)
+            .toSet()
+
+    override fun getMergedPermissions(id: Long): PermissionsBundle {
+        var group: GroupEntity? = groupRepository.findById(id).get()
+        var permissionBundle = createPermissionBundleModel(group!!.permissions!!)
+
+        while (group != null) {
+            val newPermissionBundle = createPermissionBundleModel(group.permissions!!)
+            permissionBundle = permissionBundle.mergeWith(newPermissionBundle)
+
+            group = group.parentGroup
+        }
+
+        return permissionBundle
+    }
+
+    override fun getMergedPermissions(ids: List<Long>): PermissionsBundle {
+        val groups = groupRepository.findAllById(ids)
+        val fullPermissions = groups.map { getMergedPermissions(it!!.id!!) }
+
+        val permissions = fullPermissions.fold(PermissionsBundle.Worst) { merged, next ->
+            merged.mergeWith(next)
+        }
+
+        return permissions
+    }
 
 
-    override fun getCourses(id: Long) = groupRepository
-        .getCoursesForGroup(id)
-        .map(::createCourseModel).toSet()
+    override fun getCourses(id: Long): Set<Course> {
+        val groups = groupRepository.getParentGroups(id)
+
+        return groups.map { group ->
+            groupRepository
+                .getCoursesForGroup(group.id!!)
+                .map(::createCourseModel)
+        }.flatten()
+            .distinctBy { it.id }
+            .toSet()
+    }
 
 
     override fun existsById(id: Long) = groupRepository

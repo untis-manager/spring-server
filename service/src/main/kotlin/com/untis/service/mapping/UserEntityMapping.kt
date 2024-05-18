@@ -1,12 +1,12 @@
 package com.untis.service.mapping
 
 import com.untis.database.entity.GroupEntity
-import com.untis.database.entity.RoleEntity
 import com.untis.database.entity.UserEntity
 import com.untis.model.AddressInfo
+import com.untis.model.PermissionsBundle
 import com.untis.model.User
 
-internal fun createUserModel(entity: UserEntity): User = User(
+internal fun createUserModel(entity: UserEntity, permissions: PermissionsBundle): User = User(
     id = entity.id!!,
     addressInfo = entity.extractAddressInfo(),
     firstName = entity.firstName!!,
@@ -15,10 +15,10 @@ internal fun createUserModel(entity: UserEntity): User = User(
     encodedPassword = entity.password!!,
     birthDate = entity.birthday!!,
     gender = createGenderInfo(entity.gender!!),
-    role = createRoleModel(entity.role!!)
+    permissions = permissions
 )
 
-internal fun createUserEntity(model: User, roleEntity: RoleEntity, groupEntities: Set<GroupEntity>): UserEntity = UserEntity(
+internal fun createUserEntity(model: User, groupEntities: Set<GroupEntity>): UserEntity = UserEntity(
     id = model.id,
     firstName = model.firstName,
     lastName = model.lastName,
@@ -31,7 +31,6 @@ internal fun createUserEntity(model: User, roleEntity: RoleEntity, groupEntities
     country = model.addressInfo.country,
     gender = model.gender.mapToString(),
     birthday = model.birthDate,
-    role = roleEntity,
     groups = groupEntities.toMutableSet()
 )
 

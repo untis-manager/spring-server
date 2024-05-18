@@ -2,17 +2,15 @@ package com.untis.service.impl
 
 import com.untis.database.entity.GroupEntity
 import com.untis.database.repository.CourseRepository
+import com.untis.database.repository.GroupRepository
 import com.untis.database.repository.UserRepository
 import com.untis.model.Course
 import com.untis.model.CourseTiming
 import com.untis.model.Group
 import com.untis.model.User
 import com.untis.service.CourseService
+import com.untis.service.GroupService
 import com.untis.service.mapping.*
-import com.untis.service.mapping.createCourseEntity
-import com.untis.service.mapping.createCourseModel
-import com.untis.service.mapping.createCourseTimingEntity
-import com.untis.service.mapping.createGroupEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -21,7 +19,11 @@ internal class DatabaseCourseService @Autowired constructor(
 
     val courseRepository: CourseRepository,
 
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
+
+    val groupService: GroupService,
+
+    val groupRepository: GroupRepository
 
 ) : CourseService {
 
@@ -40,16 +42,22 @@ internal class DatabaseCourseService @Autowired constructor(
         val course = courseRepository.findById(id).orElse(null)
         val userEntity = userRepository.findById(user).get()
 
-        val courseGroups = course?.groups?.map(GroupEntity::id) ?: emptyList()
+        val courseGroups = course?.groups?.map { it.id!! } ?: emptyList()
         val userGroups = userEntity.groups?.map(GroupEntity::id) ?: emptyList()
+        val userHierarchyGroups = groupRepository.getParentGroups(userGroups.filterNotNull()).map { it.id!! }
 
-        return if (courseGroups.any { it in userGroups }) createCourseModel(course)
+        return if (courseGroups.any { it in userHierarchyGroups }) createCourseModel(course)
         else null
     }
 
-    override fun getAllForUser(user: Long) = courseRepository
-        .getAllForUser(user)
-        .map(::createCourseModel)
+    override fun getAllForUser(user: Long): List<Course> {
+        val groups = groupRepository.getGroupsForUser(user).map { it.id!! }
+        val hierarchyGroups = groupRepository.getParentGroups(groups)
+
+        val courses = hierarchyGroups.map { it.id!! }.let(courseRepository::getForGroups)
+
+        return courses.map(::createCourseModel)
+    }
 
 
     override fun existsById(id: Long) = courseRepository
@@ -84,9 +92,8 @@ internal class DatabaseCourseService @Autowired constructor(
 
     override fun updateLeaders(id: Long, leaders: List<User>) {
         val entities = leaders.map {
-            val role = userRepository.findById(it.id!!).get().role!!
             val groups = userRepository.findById(it.id!!).get().groups!!
-            createUserEntity(it, role, groups)
+            createUserEntity(it, groups)
         }
         val entity = courseRepository.findById(id).get()
 
@@ -114,10 +121,23 @@ internal class DatabaseCourseService @Autowired constructor(
         courseRepository.save(entity)
     }
 
+    override fun getAllForGroup(groupId: Long): List<Course> {
+        val groups = groupRepository.getParentGroups(groupId).map { it.id!! }
+
+        val courses = groups.let(courseRepository::getForGroups)
+
+        return courses.map(::createCourseModel)
+    }
+
     override fun getLeaders(id: Long) = courseRepository
         .findById(id).get()
         .leaders!!
-        .map(::createUserModel).toSet()
+        .map { user ->
+            val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+            createUserModel(user, perms)
+        }
+        .toSet()
 
     override fun getGroups(id: Long) = courseRepository
         .findById(id).get()

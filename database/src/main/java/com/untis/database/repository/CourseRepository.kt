@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface CourseRepository: SimpleRepository<CourseEntity> {
 
-    fun getAllForUser(userId: Long): List<CourseEntity>
+    fun getForGroups(groupIds: List<Long>): List<CourseEntity>
 
 }

@@ -7,7 +7,7 @@ import jakarta.persistence.*
  */
 @Entity(name = "permissions")
 @Table(name = "permissions")
-class GroupPermissions (
+class GroupPermissionsEntity (
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

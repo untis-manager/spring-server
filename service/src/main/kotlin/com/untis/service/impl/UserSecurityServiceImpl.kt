@@ -4,6 +4,7 @@ import com.untis.mail.MailService
 import com.untis.model.Permission
 import com.untis.model.SecurityTokenType
 import com.untis.model.User
+import com.untis.service.GroupService
 import com.untis.service.SecurityTokenService
 import com.untis.service.UserSecurityService
 import com.untis.service.UserService
@@ -20,6 +21,8 @@ import java.util.*
 internal class UserSecurityServiceImpl @Autowired constructor(
 
     val userService: UserService,
+
+    val groupService: GroupService,
 
     val tokenService: SecurityTokenService,
 
@@ -49,7 +52,7 @@ internal class UserSecurityServiceImpl @Autowired constructor(
                 secToken.tokenType == SecurityTokenType.ResetPassword &&
                 secToken.additionalInfo != null &&
                 user != null &&
-                user.role.permissions.profile.matches(Permission.Profile.Edit)
+                user.permissions.profile.matches(Permission.Profile.Edit)
 
         if (!isValid) return false
 
@@ -86,7 +89,7 @@ internal class UserSecurityServiceImpl @Autowired constructor(
                 secToken.additionalInfo != null &&
                 secToken.tokenType == SecurityTokenType.ResetPassword &&
                 user != null &&
-                user.role.permissions.profile.matches(Permission.Profile.Edit)
+                user.permissions.profile.matches(Permission.Profile.Edit)
 
         if (!isValid) return false
 

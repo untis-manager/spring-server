@@ -6,6 +6,7 @@ import com.untis.database.repository.UserRepository
 import com.untis.model.CourseInstanceInfo
 import com.untis.model.User
 import com.untis.service.CourseInstanceInfoService
+import com.untis.service.GroupService
 import com.untis.service.mapping.createCourseInstanceInfoEntity
 import com.untis.service.mapping.createCourseInstanceInfoModel
 import com.untis.service.mapping.createCourseModel
@@ -21,7 +22,9 @@ internal class DatabaseCourseInstanceInfoService(
 
     val courseRepository: CourseRepository,
 
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
+
+    val groupService: GroupService
 
 ) : CourseInstanceInfoService {
 
@@ -92,7 +95,11 @@ internal class DatabaseCourseInstanceInfoService(
     override fun changedLeadersFor(id: Long) = instanceInfoRepository
         .findById(id).get()
         .changedLeaders
-        ?.map(::createUserModel)
+        ?.map { user ->
+            val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+            createUserModel(user, perms)
+        }
 
 
     override fun create(model: CourseInstanceInfo): CourseInstanceInfo {
