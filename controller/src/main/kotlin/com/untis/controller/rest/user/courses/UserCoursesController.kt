@@ -115,7 +115,7 @@ class UserCoursesController @Autowired constructor(
 
         val leaders = courseService.getLeaders(id)
 
-        val userPerms = user.role.permissions.users
+        val userPerms = user.permissions.users
         val responses = if (userPerms.matches(Permission.Users.Full))
             leaders.map(FullUserResponse::create)
         else if (userPerms.matches(Permission.Users.Partial))
