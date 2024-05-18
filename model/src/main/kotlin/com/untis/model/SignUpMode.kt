@@ -18,9 +18,9 @@ sealed class SignUpMode(
     data class Free(
 
         /**
-         * The id of the role a user is given when signing up
+         * The id of the group a user is given when signing up
          */
-        val defaultRoleId: Long,
+        val defaultGroupId: Long,
 
         /**
          * Whether a user needs to verify their email when signing up

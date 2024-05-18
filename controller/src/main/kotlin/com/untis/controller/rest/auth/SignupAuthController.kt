@@ -34,11 +34,11 @@ class SignupAuthController @Autowired constructor(
 
     override val signUpTokenService: SignUpTokenService,
 
+    override val groupService: GroupService,
+
     private val serverSettingsService: ServerSettingsService,
 
     override val userService: UserService,
-
-    override val roleService: RoleService,
 
     private val userSecurityService: UserSecurityService,
 
@@ -101,10 +101,13 @@ class SignupAuthController @Autowired constructor(
         requestBody.userData.validateContents()
 
         // Create user
-        val role = roleService.getById(mode.defaultRoleId)
+        val group = groupService.getById(mode.defaultGroupId)
+        val permissions = groupService.getMergedPermissions(group.id!!)
         val user = requestBody.userData
-            .toUser(role)
-            .let(userService::create)
+            .toUser(permissions)
+            .let {
+                userService.create(it, group.id!!)
+            }
 
         return ResponseEntity.ok().body(FullUserResponse.create(user))
     }
@@ -132,10 +135,12 @@ class SignupAuthController @Autowired constructor(
 
         // Check token
         val token = validateSignUpToken(requestBody.token)
+        if (token.userData.groupIds.isEmpty()) return ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR) // At least one group is needed
 
         // Create user
-        val role = roleService.getById(token.userData.roleId)
-        val user = userFromToken(token, requestBody.userData, role)
+        val groups = token.userData.groupIds.map { groupService.getById(it) }
+        val mergedPermissions = groupService.getMergedPermissions(groups.first().id!!)
+        val user = userFromToken(token, requestBody.userData, mergedPermissions)
             .let(userService::create)
 
         userService.updateGroups(user.id!!, token.userData.groupIds)
@@ -179,16 +184,7 @@ class SignupAuthController @Autowired constructor(
     fun createWithSecret(
         @RequestBody requestBody: AdminUserRequest
     ): ResponseEntity<FullUserResponse> {
-        if (requestBody.secret != secret) return ResponseEntity(HttpStatus.UNAUTHORIZED)
-
-        requestBody.userData.validateContents()
-
-        val adminRole = roleService.createOrGetAdminRole()
-        val user = requestBody.userData
-            .toUser(adminRole)
-            .let(userService::create)
-
-        return ResponseEntity.ok().body(FullUserResponse.create(user))
+        TODO("Figure out how to do this properly")
     }
 
     private fun validateSignUpMode(emailVerification: Boolean = false, matcher: (SignUpMode) -> Boolean) {
@@ -215,7 +211,7 @@ class SignupAuthController @Autowired constructor(
     }
 
     private fun UserRequest.toUser(
-        role: Role
+        permissions: PermissionsBundle
     ) = User(
         id = null,
         addressInfo = AddressInfo(
@@ -231,7 +227,7 @@ class SignupAuthController @Autowired constructor(
         encodedPassword = passwordEncoder.encode(password),
         birthDate = birthday.toLocalDate(),
         gender = createGenderInfo(gender),
-        role = role
+        permissions = permissions
     )
 
 
@@ -252,7 +248,7 @@ class SignupAuthController @Autowired constructor(
         return supToken
     }
 
-    private fun userFromToken(token: SignUpToken, body: UserRequest, role: Role) = User(
+    private fun userFromToken(token: SignUpToken, body: UserRequest, permissions: PermissionsBundle) = User(
         id = null,
         addressInfo = AddressInfo(
             country = token.userData.country ?: body.country,
@@ -267,7 +263,7 @@ class SignupAuthController @Autowired constructor(
         encodedPassword = passwordEncoder.encode(body.password),
         birthDate = token.userData.birthday ?: body.birthday.toLocalDate(),
         gender = token.userData.gender ?: createGenderInfo(body.gender),
-        role = role
+        permissions = permissions
     )
 
 }

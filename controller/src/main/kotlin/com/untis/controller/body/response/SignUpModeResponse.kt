@@ -19,7 +19,7 @@ data class SignUpModeResponse(
     companion object {
 
         fun create(model: SignUpMode) = when (model) {
-            is SignUpMode.Free -> SignUpModeResponse(model.name, model.needEmailVerification, model.defaultRoleId)
+            is SignUpMode.Free -> SignUpModeResponse(model.name, model.needEmailVerification, model.defaultGroupId)
             else -> SignUpModeResponse(model.name)
         }
 

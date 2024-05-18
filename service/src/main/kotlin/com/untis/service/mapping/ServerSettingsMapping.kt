@@ -11,13 +11,13 @@ fun createServerSettingsModel(entity: ServerSettingsEntity) = ServerSettings(
 fun createServerSettingsEntity(model: ServerSettings) = ServerSettingsEntity(
     id = 1L,
     signupMode = model.signUpMode.name,
-    signupFreeDefaultRoleId = (model.signUpMode as? SignUpMode.Free)?.defaultRoleId,
+    signupFreeDefaultRoleId = (model.signUpMode as? SignUpMode.Free)?.defaultGroupId,
     signupFreeNeedsEmailVerification = (model.signUpMode as? SignUpMode.Free)?.needEmailVerification
 )
 
 private fun ServerSettingsEntity.extractSignUpMode(): SignUpMode = when (signupMode) {
     "free" -> SignUpMode.Free(
-        defaultRoleId = signupFreeDefaultRoleId!!,
+        defaultGroupId = signupFreeDefaultRoleId!!,
         needEmailVerification = signupFreeNeedsEmailVerification!!
     )
 

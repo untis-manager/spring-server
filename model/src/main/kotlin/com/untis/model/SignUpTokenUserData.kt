@@ -60,11 +60,6 @@ data class SignUpTokenUserData(
     val birthday: LocalDate? = null,
 
     /**
-     * The role the user will have
-     */
-    val roleId: Long,
-
-    /**
      * The groups the user will be joined in.
      */
     val groupIds: Set<Long> = emptySet()
