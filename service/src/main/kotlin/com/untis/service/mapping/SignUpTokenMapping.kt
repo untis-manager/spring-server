@@ -21,7 +21,6 @@ fun createSignUpTokenModel(entity: SignupTokenEntity) = SignUpToken(
         houseNumber = entity.houseNumber,
         gender = entity.gender?.let(::createGenderInfo),
         birthday = entity.birthday,
-        roleId = entity.roleId!!,
         groupIds = entity.groupIds!!.toSet(),
     )
 )
@@ -42,6 +41,5 @@ fun createSignUpTokenEntity(model: SignUpToken) = SignupTokenEntity(
     houseNumber = model.userData.houseNumber,
     gender = model.userData.gender?.mapToString(),
     birthday = model.userData.birthday,
-    roleId = model.userData.roleId,
     groupIds = model.userData.groupIds.toList()
 )

@@ -4,7 +4,6 @@ import com.untis.database.repository.CourseInstanceInfoRepository
 import com.untis.database.repository.CourseRepository
 import com.untis.database.repository.UserRepository
 import com.untis.model.CourseInstanceInfo
-import com.untis.model.User
 import com.untis.service.CourseInstanceInfoService
 import com.untis.service.GroupService
 import com.untis.service.mapping.createCourseInstanceInfoEntity
@@ -30,12 +29,32 @@ internal class DatabaseCourseInstanceInfoService(
 
 
     override fun getAll() = instanceInfoRepository.findAll().map {
-        createCourseInstanceInfoModel(it, createCourseModel(it.course!!))
+        createCourseInstanceInfoModel(
+            entity = it,
+            course = createCourseModel(it.course!!),
+            changedLeaders = if (it.isLeaderChange!!) {
+                it.changedLeaders!!.map { user ->
+                    val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+                    createUserModel(user, perms)
+                }
+            } else null
+        )
     }.toSet()
 
 
     override fun getById(id: Long) = instanceInfoRepository.findById(id).get().let {
-        createCourseInstanceInfoModel(it, createCourseModel(it.course!!))
+        createCourseInstanceInfoModel(
+            entity = it,
+            course = createCourseModel(it.course!!),
+            changedLeaders = if (it.isLeaderChange!!) {
+                it.changedLeaders!!.map { user ->
+                    val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+                    createUserModel(user, perms)
+                }
+            } else null
+        )
     }
 
     override fun getByIdAndUser(id: Long, user: Long): CourseInstanceInfo? {
@@ -52,7 +71,19 @@ internal class DatabaseCourseInstanceInfoService(
 
     override fun getByCourse(courseId: Long) = instanceInfoRepository
         .getAllForCourse(courseId)
-        .map { createCourseInstanceInfoModel(it, createCourseModel(it.course!!)) }.toSet()
+        .map {
+            createCourseInstanceInfoModel(
+                entity = it,
+                course = createCourseModel(it.course!!),
+                changedLeaders = if (it.isLeaderChange!!) {
+                    it.changedLeaders!!.map { user ->
+                        val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+                        createUserModel(user, perms)
+                    }
+                } else null
+            )
+        }.toSet()
 
 
     override fun getByCourseDefinitive(
@@ -61,7 +92,19 @@ internal class DatabaseCourseInstanceInfoService(
         startTime: LocalTime,
     ) = instanceInfoRepository
         .getByDefinition(courseId, date, startTime)
-        .map { createCourseInstanceInfoModel(it, createCourseModel(it.course!!)) }.firstOrNull()
+        .map {
+            createCourseInstanceInfoModel(
+                entity = it,
+                course = createCourseModel(it.course!!),
+                changedLeaders = if (it.isLeaderChange!!) {
+                    it.changedLeaders!!.map { user ->
+                        val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+                        createUserModel(user, perms)
+                    }
+                } else null
+            )
+        }.firstOrNull()
 
     override fun update(
         instanceInfo: CourseInstanceInfo
@@ -74,7 +117,15 @@ internal class DatabaseCourseInstanceInfoService(
         return createCourseInstanceInfoEntity(instanceInfo, course, changedLeaders).let(instanceInfoRepository::save)
             .let {
                 createCourseInstanceInfoModel(
-                    entity = it, course = createCourseModel(course)
+                    entity = it,
+                    course = createCourseModel(it.course!!),
+                    changedLeaders = if (it.isLeaderChange!!) {
+                        it.changedLeaders!!.map { user ->
+                            val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+                            createUserModel(user, perms)
+                        }
+                    } else null
                 )
             }
     }
@@ -89,7 +140,19 @@ internal class DatabaseCourseInstanceInfoService(
 
         return entity
             .let(instanceInfoRepository::save)
-            .let { createCourseInstanceInfoModel(it, course) }
+            .let {
+                createCourseInstanceInfoModel(
+                    entity = it,
+                    course = course,
+                    changedLeaders = if (it.isLeaderChange!!) {
+                        it.changedLeaders!!.map { user ->
+                            val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+                            createUserModel(user, perms)
+                        }
+                    } else null
+                )
+            }
     }
 
     override fun changedLeadersFor(id: Long) = instanceInfoRepository
@@ -110,7 +173,17 @@ internal class DatabaseCourseInstanceInfoService(
 
         return entity.let(instanceInfoRepository::save).let { instanceInfo ->
             val courseModel = createCourseModel(courseEntity)
-            createCourseInstanceInfoModel(instanceInfo, courseModel)
+            createCourseInstanceInfoModel(
+                entity = instanceInfo,
+                course = courseModel,
+                changedLeaders = if (instanceInfo.isLeaderChange!!) {
+                    instanceInfo.changedLeaders!!.map { user ->
+                        val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+                        createUserModel(user, perms)
+                    }
+                } else null
+            )
         }
     }
 
@@ -121,6 +194,16 @@ internal class DatabaseCourseInstanceInfoService(
 
         instanceInfoRepository.delete(entity)
 
-        return createCourseInstanceInfoModel(entity, createCourseModel(courseEntity))
+        return createCourseInstanceInfoModel(
+            entity = entity,
+            course = createCourseModel(courseEntity),
+            changedLeaders = if (entity.isLeaderChange!!) {
+                entity.changedLeaders!!.map { user ->
+                    val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+                    createUserModel(user, perms)
+                }
+            } else null
+        )
     }
 }
