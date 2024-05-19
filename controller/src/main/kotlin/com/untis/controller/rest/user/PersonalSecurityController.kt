@@ -100,7 +100,7 @@ class PersonalSecurityController @Autowired constructor(
 
             if (user == null) {
                 return ResponseEntity(HttpStatus.UNAUTHORIZED)
-            } else if (!user.role.permissions.profile.matches(Permission.Profile.Edit)) {
+            } else if (!user.permissions.profile.matches(Permission.Profile.Edit)) {
                 return ResponseEntity(HttpStatus.FORBIDDEN)
             }
 

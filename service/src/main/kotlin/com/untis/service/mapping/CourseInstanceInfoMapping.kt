@@ -5,8 +5,13 @@ import com.untis.database.entity.CourseInstanceInfoEntity
 import com.untis.database.entity.UserEntity
 import com.untis.model.Course
 import com.untis.model.CourseInstanceInfo
+import com.untis.model.User
 
-internal fun createCourseInstanceInfoModel(entity: CourseInstanceInfoEntity, course: Course) =
+internal fun createCourseInstanceInfoModel(
+    entity: CourseInstanceInfoEntity,
+    course: Course,
+    changedLeaders: List<User>?
+) =
     CourseInstanceInfo(
         id = entity.id,
         notes = entity.notes!!,
@@ -15,7 +20,7 @@ internal fun createCourseInstanceInfoModel(entity: CourseInstanceInfoEntity, cou
         course = course,
         isCancelled = entity.isCanceled!!,
         changedLocation = entity.changedLocation,
-        changedLeaders = if (entity.isLeaderChange!!) entity.changedLeaders?.map(::createUserModel) else null
+        changedLeaders = changedLeaders
     )
 
 internal fun createCourseInstanceInfoEntity(

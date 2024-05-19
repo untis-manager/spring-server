@@ -42,13 +42,6 @@ fun ControllerScope.validateCourseTimingExists(id: Long) = validate(id, null, "c
 fun ControllerScope.validateGroupExists(id: Long, userId: Long? = null) = validate(id, null, "group", groupService)
 
 /**
- * Validates that a role with [id] exists
- *
- * @param id The id to check for
- */
-fun ControllerScope.validateRoleExists(id: Long) = validate(id, null, "role", roleService)
-
-/**
  * Validates that an announcement message with [id] exists
  *
  * @param id The id to check for

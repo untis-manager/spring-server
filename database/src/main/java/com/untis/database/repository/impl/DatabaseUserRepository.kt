@@ -12,15 +12,11 @@ internal class DatabaseUserRepository @Autowired constructor(
     private val delegate: UserCrudRepository
 ) : UserRepository {
 
-    override fun getAllWithRole(roleId: Long) = delegate.getAllWithRole(roleId)
-
     override fun getUserForSecurityToken(token: UUID) = delegate.getUserForSecurityToken(token)
 
     override fun getByEmail(email: String) = delegate.getByEmail(email)
 
-    override fun getByRole(roleId: Long) = delegate.getByRole(roleId)
-
-    override fun getUsersInGroup(groupId: Long) = delegate.getUsersInGroup(groupId)
+    override fun getUsersInGroups(groupIds: List<Long>) = delegate.getUsersInGroups(groupIds)
 
     override fun save(entity: UserEntity) = delegate.save(entity)
 

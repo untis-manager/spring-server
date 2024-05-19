@@ -8,6 +8,7 @@ import com.untis.database.repository.UserRepository
 import com.untis.model.AnnouncementMessage
 import com.untis.model.Group
 import com.untis.service.AnnouncementMessageService
+import com.untis.service.GroupService
 import com.untis.service.mapping.createAnnouncementMessageEntity
 import com.untis.service.mapping.createAnnouncementMessageModel
 import com.untis.service.mapping.createGroupModel
@@ -27,7 +28,9 @@ internal class DatabaseAnnouncementMessageService @Autowired constructor(
 
     val attachmentStore: AttachmentStore,
 
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
+
+    val groupService: GroupService
 
 ) : AnnouncementMessageService {
 
@@ -40,15 +43,18 @@ internal class DatabaseAnnouncementMessageService @Autowired constructor(
         .findAll()
         .map(::createAnnouncementMessageModel).toSet()
 
-    override fun getGroupsFor(id: Long): List<Group> =
+    override fun getRecipientGroups(id: Long): List<Group> =
         messageRepository.findById(id).get()
             .recipients!!
             .map(::createGroupModel)
 
-    override fun getForGroups(vararg groupId: Long) = messageRepository
-        .getAllForGroups(groupId.toList())
-        .map(::createAnnouncementMessageModel)
-        .toSet()
+    override fun getForGroups(groupIds: List<Long>): Set<AnnouncementMessage> {
+        val groupsInHierarchy = groupRepository.getParentGroups(groupIds).map { it.id!! }
+        return messageRepository
+            .getAllForGroups(groupsInHierarchy)
+            .map(::createAnnouncementMessageModel)
+            .toSet()
+    }
 
     override fun updateReadBy(id: Long, users: List<Long>) {
         val entity = messageRepository.findById(id).get()
@@ -69,12 +75,20 @@ internal class DatabaseAnnouncementMessageService @Autowired constructor(
     override fun getReadBy(id: Long) = messageRepository
         .findById(id).get()
         .readBy!!
-        .map(::createUserModel)
+        .map { user ->
+            val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+            createUserModel(user, perms)
+        }
 
     override fun getConfirmedBy(id: Long) = messageRepository
         .findById(id).get()
         .confirmedBy!!
-        .map(::createUserModel)
+        .map { user ->
+            val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+            createUserModel(user, perms)
+        }
 
     override fun update(message: AnnouncementMessage): AnnouncementMessage {
         if (!existsById(message.id!!)) throw IllegalArgumentException("Message with '${message.id}' not found")
@@ -98,12 +112,15 @@ internal class DatabaseAnnouncementMessageService @Autowired constructor(
         val userGroups = userRepository
             .findById(userId).get()
             .groups!!
+            .map { it.id!! }
+        val hierarchyGroups = groupRepository.getParentGroups(userGroups).map { it.id!! }
 
         val messageGroups = messageRepository
             .findById(messageId).get()
             .recipients!!
+            .map { it.id!! }
 
-        return userGroups.any { it in messageGroups }
+        return hierarchyGroups.any { it in messageGroups }
     }
 
     override fun getById(id: Long) = messageRepository
@@ -112,15 +129,17 @@ internal class DatabaseAnnouncementMessageService @Autowired constructor(
 
     override fun getByIdAndUser(id: Long, user: Long): AnnouncementMessage? {
         val message = messageRepository.findById(id).orElse(null)
-        val messageGroups = message.recipients?.map { it.id } ?: emptyList()
 
-        return if (user in messageGroups) createAnnouncementMessageModel(message)
+        return if (userHasAccessTo(user, id)) message.let(::createAnnouncementMessageModel)
         else null
     }
 
-    override fun getAllForUser(user: Long) = messageRepository
-        .getAllForUser(user)
-        .map(::createAnnouncementMessageModel)
+    override fun getAllForUser(user: Long) = userRepository
+        .findById(user).get()
+        .groups!!
+        .map { it.id!! }
+        .let { getForGroups(it) }
+        .toList()
 
     override fun delete(id: Long) = messageRepository
         .findById(id).get()

@@ -33,11 +33,6 @@ abstract class ControllerScope(
     open val tokenService: SecurityTokenService? = null,
 
     /**
-     * The role service
-     */
-    open val roleService: RoleService? = null,
-
-    /**
      * The service for sign-up-tokens
      */
     open val signUpTokenService: SignUpTokenService? = null,

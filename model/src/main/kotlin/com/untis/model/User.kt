@@ -48,13 +48,13 @@ data class User(
     val gender: GenderInfo,
 
     /**
-     * Role of the user
+     * The ultimate permissions that the user is given by the groups it is part of.
      */
-    val role: Role
+    val permissions: PermissionsBundle
 
 ) : UserDetails {
 
-    override fun getAuthorities() = this.role.permissions.allWithPrefix().map { entry ->
+    override fun getAuthorities() = permissions.allWithPrefix().map { entry ->
         entry.value.authoritiesDownwards(entry.key)
     }.flatten()
         .map(::SimpleGrantedAuthority)

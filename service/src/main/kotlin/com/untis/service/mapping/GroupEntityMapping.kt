@@ -5,7 +5,8 @@ import com.untis.model.Group
 
 internal fun createGroupModel(entity: GroupEntity) = Group(
     id = entity.id!!,
-    name = entity.name!!
+    name = entity.name!!,
+    permissions = createPartialPermissionBundleModel(entity.permissions!!)
 )
 
 internal fun createGroupEntity(model: Group) =

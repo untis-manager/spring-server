@@ -64,9 +64,6 @@ class SignupTokenEntity(
     @Column(name = "birthday")
     var birthday: LocalDate? = null,
 
-    @Column(name = "role_id", nullable = false)
-    var roleId: Long? = null,
-
     @Column(name = "group_ids", nullable = false)
     @Convert(converter = IdListConverter::class)
     var groupIds: List<Long>? = null

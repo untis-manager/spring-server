@@ -76,7 +76,7 @@ class UserAnnouncementController @Autowired constructor(
         validateAnnouncementMessageExists(id, user.id!!)
 
         return announcementMessageService
-            .getGroupsFor(id)
+            .getRecipientGroups(id)
             .map(GroupResponse::create)
     }
 

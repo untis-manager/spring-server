@@ -14,6 +14,6 @@ data class UpdateSignUpModeRequest (
     val emailVerification: Boolean?,
 
     @JsonProperty("defaultRoleId")
-    val defaultRoleId: Long?
+    val defaultGroupId: Long?
 
 )

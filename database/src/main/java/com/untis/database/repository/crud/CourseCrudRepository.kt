@@ -13,10 +13,8 @@ internal interface CourseCrudRepository : CrudRepository<CourseEntity, Long> {
         SELECT DISTINCT c
         FROM courses c
         INNER JOIN c.groups g
-        WHERE g in (
-            SELECT u.groups FROM users u WHERE u.id = :userId
-        )
+        WHERE g.id in :groupIds
     """)
-    fun getAllForUser(userId: Long): List<CourseEntity>
+    fun getForGroupId(groupIds: List<Long>): List<CourseEntity>
 
 }

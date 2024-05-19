@@ -12,14 +12,10 @@ import java.util.*
 @Repository
 interface UserRepository : SimpleRepository<UserEntity> {
 
-    fun getAllWithRole(roleId: Long)
-
     fun getUserForSecurityToken(token: UUID): Optional<UserEntity>
 
     fun getByEmail(email: String): Optional<UserEntity>
 
-    fun getByRole(roleId: Long): List<UserEntity>
-
-    fun getUsersInGroup(groupId: Long): List<UserEntity>
+    fun getUsersInGroups(groupIds: List<Long>): List<UserEntity>
 
 }

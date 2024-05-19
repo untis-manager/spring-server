@@ -43,15 +43,15 @@ interface AnnouncementMessageService : BaseService<AnnouncementMessage> {
      * @param id: The id of the message
      * @return: The groups
      */
-    fun getGroupsFor(id: Long): List<Group>
+    fun getRecipientGroups(id: Long): List<Group>
 
     /**
      * Gets the messages associated with groups
      *
-     * @param groupId: The ids of the groups
+     * @param groupIds: The ids of the groups
      * @return: The messages
      */
-    fun getForGroups(vararg groupId: Long): Set<AnnouncementMessage>
+    fun getForGroups(groupIds: List<Long>): Set<AnnouncementMessage>
 
     /**
      * Updates the users that have read the message

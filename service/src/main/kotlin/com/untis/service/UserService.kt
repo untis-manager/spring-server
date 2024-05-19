@@ -1,6 +1,8 @@
 package com.untis.service
 
-import com.untis.model.*
+import com.untis.model.Course
+import com.untis.model.Group
+import com.untis.model.User
 import com.untis.service.base.BaseService
 
 /**
@@ -17,14 +19,6 @@ interface UserService : BaseService<User> {
      * @return The user, or null if no user matches the email
      */
     fun getByEmail(email: String): User?
-
-    /**
-     * Gets all users by a specified role
-     *
-     * @param roleId The id of the role to search for
-     * @return All users with that role
-     */
-    fun getByRole(roleId: Long): Set<User>
 
     /**
      * Gets all in the specified group
@@ -44,26 +38,17 @@ interface UserService : BaseService<User> {
 
     /**
      * Updates the user
-     * 
+     *
      * Updates the already persisted user with [User.id] to the values in [user]
      *
      * [User.id] must not be null
      *
      * A user with [User.id] must already exist
-     * 
+     *
      * @param user The user to update
      * @return The updated user
      */
     fun update(user: User): User
-
-    /**
-     * Adds the user to the specified group
-     *
-     * @param groupId The id of the group
-     * @param userId The id of the user
-     * @return The user for [userId]
-     */
-    fun addToGroup(groupId: Long, userId: Long): User
 
     /**
      * Changes the groups of a user to those in [groupIds]
@@ -73,5 +58,15 @@ interface UserService : BaseService<User> {
      * @return The groups the user is now part of
      */
     fun updateGroups(userId: Long, groupIds: Set<Long>): Set<Group>
+
+    /**
+     * Creates a user. The 'permissions' is ignored.
+     *
+     * @param user The user model
+     * @param groupId The id of the group to set the user to
+     *
+     * @return The created user
+     */
+    fun create(user: User, groupId: Long): User
 
 }

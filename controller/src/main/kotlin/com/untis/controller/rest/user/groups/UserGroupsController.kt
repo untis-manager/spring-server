@@ -5,6 +5,7 @@ import com.untis.controller.body.parameter.UserRequestModeParameter
 import com.untis.controller.body.response.FullUserResponse
 import com.untis.controller.body.response.PartialUserResponse
 import com.untis.controller.body.response.course.CourseResponse
+import com.untis.controller.body.response.group.GroupHierarchyElement
 import com.untis.controller.body.response.group.GroupResponse
 import com.untis.controller.util.ok
 import com.untis.controller.util.unauthorized
@@ -37,7 +38,7 @@ class UserGroupsController @Autowired constructor(
 ) : ControllerScope() {
 
     /**
-     * Endpoint that returns the groups of the authenticated user
+     * Endpoint that returns the groups the authenticated user is in
      *
      * @param user The authenticated user
      * @return The groups
@@ -50,7 +51,33 @@ class UserGroupsController @Autowired constructor(
         .map(GroupResponse::create)
 
     /**
-     * Endpoint that returns a group specific by id for a user
+     * Endpoint that returns the hierarchy of the groups the user is in.
+     *
+     * For each group the user is actively in, this endpoint returns all the parents of each group.
+     *
+     * @param user The authenticated user
+     * @return The group hierarchy
+     */
+    @GetMapping("/hierarchy/")
+    fun getGroupsHierarchy(
+        @AuthenticationPrincipal user: User,
+    ): List<GroupHierarchyElement> {
+        val directGroups = groupService.getAllForUser(user.id!!)
+        val eachParents = directGroups.map { group ->
+            val parents = groupService.getParentGroups(group.id!!)
+            group to parents.subList(1, parents.size)
+        }
+
+        val elements = eachParents.map { pair ->
+            GroupHierarchyElement.create(pair.first, pair.second)
+        }
+        return elements
+    }
+
+    /**
+     * Endpoint that returns a group specific by id for a user.
+     *
+     * Also allows user to access groups they are only indirectly parts of.
      *
      * @param user The authenticated user
      * @param id The path variable id of the course
@@ -112,7 +139,7 @@ class UserGroupsController @Autowired constructor(
 
         val members = groupService.getUsers(id)
 
-        val userPerms = user.role.permissions.users
+        val userPerms = user.permissions.users
         val responses = if (userPerms.matches(Permission.Users.Full))
             members.map(FullUserResponse::create)
         else if (userPerms.matches(Permission.Users.Partial))

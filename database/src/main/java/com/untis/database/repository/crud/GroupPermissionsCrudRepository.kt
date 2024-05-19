@@ -1,9 +1,8 @@
 package com.untis.database.repository.crud
 
-import com.untis.database.entity.RoleEntity
+import com.untis.database.entity.GroupPermissionsEntity
 import org.springframework.data.repository.CrudRepository
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
 
 @Repository
-internal interface RoleCrudRepository : CrudRepository<RoleEntity, Long>
+internal interface GroupPermissionsCrudRepository : CrudRepository<GroupPermissionsEntity, Long>

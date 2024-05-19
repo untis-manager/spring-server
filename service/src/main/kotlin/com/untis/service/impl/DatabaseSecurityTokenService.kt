@@ -5,6 +5,7 @@ import com.untis.database.repository.UserRepository
 import com.untis.model.SecurityToken
 import com.untis.model.SecurityTokenType
 import com.untis.model.User
+import com.untis.service.GroupService
 import com.untis.service.SecurityTokenService
 import com.untis.service.mapping.createSecurityTokenEntity
 import com.untis.service.mapping.createSecurityTokenModel
@@ -20,7 +21,9 @@ internal class DatabaseSecurityTokenService @Autowired constructor(
 
     val securityTokenRepository: SecurityTokenRepository,
 
-    val userRepository: UserRepository
+    val userRepository: UserRepository,
+
+    val groupService: GroupService
 
 ) : SecurityTokenService {
 
@@ -69,7 +72,11 @@ internal class DatabaseSecurityTokenService @Autowired constructor(
 
     override fun getUserFor(token: UUID) = userRepository
         .getUserForSecurityToken(token).orElse(null)
-        ?.let(::createUserModel)
+        ?.let { user ->
+            val perms = groupService.getMergedPermissions(user.groups!!.map { it.id!! })
+
+            createUserModel(user, perms)
+        }
 
 
     override fun create(model: SecurityToken): SecurityToken {

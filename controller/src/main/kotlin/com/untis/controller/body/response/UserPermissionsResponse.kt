@@ -1,6 +1,6 @@
 package com.untis.controller.body.response
 
-import com.untis.model.UserPermissions
+import com.untis.model.PermissionsBundle
 
 data class UserPermissionsResponse(
 
@@ -22,7 +22,7 @@ data class UserPermissionsResponse(
 
     companion object {
 
-        fun create(userPermissions: UserPermissions) = UserPermissionsResponse(
+        fun create(userPermissions: PermissionsBundle) = UserPermissionsResponse(
             users = PermissionResponse.create(userPermissions.users),
             profile = PermissionResponse.create(userPermissions.profile),
             courses = PermissionResponse.create(userPermissions.courses),
