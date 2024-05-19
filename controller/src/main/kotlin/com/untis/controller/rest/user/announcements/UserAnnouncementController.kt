@@ -2,7 +2,7 @@ package com.untis.controller.rest.user.announcements
 
 import com.untis.controller.base.ControllerScope
 import com.untis.controller.body.response.announcement.AnnouncementAttachmentResponse
-import com.untis.controller.body.response.announcement.AnnouncementMessageResponse
+import com.untis.controller.body.response.announcement.UserAnnouncementMessageResponse
 import com.untis.controller.body.response.group.GroupResponse
 import com.untis.controller.validating.validateAnnouncementMessageExists
 import com.untis.model.User
@@ -35,12 +35,22 @@ class UserAnnouncementController @Autowired constructor(
      * @param user The authenticated user
      * @return The messages
      */
+    @Suppress("DuplicatedCode")
     @GetMapping
     fun getAll(
         @AuthenticationPrincipal user: User
-    ): List<AnnouncementMessageResponse> = announcementMessageService
+    ): List<UserAnnouncementMessageResponse> = announcementMessageService
         .getAllForUser(user.id!!)
-        .map(AnnouncementMessageResponse::create)
+        .map { message ->
+            val confirmed = announcementMessageService.getConfirmedBy(message.id!!).map { it.id!! }
+            val read = announcementMessageService.getReadBy(message.id!!).map { it.id!! }
+
+            UserAnnouncementMessageResponse.create(
+                model = message,
+                confirmedByUser = user.id!! in confirmed,
+                readByUser = user.id!! in read
+            )
+        }
 
     /**
      * Returns the attachment message by id
@@ -49,16 +59,26 @@ class UserAnnouncementController @Autowired constructor(
      * @param id The path variable id of the message
      * @return The announcement message
      */
+    @Suppress("DuplicatedCode")
     @GetMapping("{id}/")
     fun getById(
         @AuthenticationPrincipal user: User,
         @PathVariable id: Long
-    ): AnnouncementMessageResponse {
+    ): UserAnnouncementMessageResponse {
         validateAnnouncementMessageExists(id, user.id!!)
 
         return announcementMessageService
             .getById(id)
-            .let(AnnouncementMessageResponse::create)
+            .let {
+                val confirmed = announcementMessageService.getConfirmedBy(it.id!!).map { it.id!! }
+                val read = announcementMessageService.getReadBy(it.id!!).map { it.id!! }
+
+                UserAnnouncementMessageResponse.create(
+                    model = it,
+                    confirmedByUser = user.id!! in confirmed,
+                    readByUser = user.id!! in read
+                )
+            }
     }
 
     /**
