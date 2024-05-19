@@ -17,7 +17,7 @@ class AnnouncementMessageEntity(
     @Column(name = "title", nullable = false)
     var title: String? = null,
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     var content: String? = null,
 
     @Column(name = "date_sent", nullable = false)
