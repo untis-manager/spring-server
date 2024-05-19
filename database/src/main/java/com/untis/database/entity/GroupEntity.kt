@@ -21,8 +21,11 @@ class GroupEntity(
 
     @OneToOne(
         fetch = FetchType.EAGER,
-        mappedBy = "permissions_id",
         optional = false
+    )
+    @JoinColumn(
+        name = "permissions_id",
+        nullable = false
     )
     var permissions: GroupPermissionsEntity? = null,
 
@@ -33,7 +36,7 @@ class GroupEntity(
 
     @OneToMany(
         cascade = [CascadeType.ALL],
-        mappedBy="parentGroup",
+        mappedBy = "parentGroup",
         orphanRemoval = true
     )
     var directChildrenGroups: List<GroupEntity>? = null
