@@ -1,8 +1,10 @@
 package com.untis.controller.rest.user.announcements
 
 import com.untis.controller.base.ControllerScope
+import com.untis.controller.body.parameter.UserRequestModeParameter
 import com.untis.controller.body.response.announcement.AnnouncementAttachmentResponse
 import com.untis.controller.body.response.announcement.UserAnnouncementMessageResponse
+import com.untis.controller.body.response.createUserResponse
 import com.untis.controller.body.response.group.GroupResponse
 import com.untis.controller.validating.validateAnnouncementMessageExists
 import com.untis.model.User
@@ -14,10 +16,7 @@ import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/user/announcements/")
@@ -98,6 +97,30 @@ class UserAnnouncementController @Autowired constructor(
         return announcementMessageService
             .getRecipientGroups(id)
             .map(GroupResponse::create)
+    }
+
+    /**
+     * Returns the author that a specific announcement was sent by
+     *
+     * @param user The authenticated user
+     * @param id The path variable id of the message
+     * @return The author it was sent to
+     */
+    @GetMapping("{id}/author/")
+    fun getMessageGroups(
+        @AuthenticationPrincipal user: User,
+        @RequestParam mode: UserRequestModeParameter,
+        @PathVariable id: Long
+    ): ResponseEntity<Any> {
+        validateAnnouncementMessageExists(id, user.id!!)
+
+        val author = announcementMessageService.getAuthorFor(id)
+
+        return createUserResponse(
+            user = author,
+            mode = mode,
+            userPerms = user.permissions.users
+        )
     }
 
     /**

@@ -1,6 +1,8 @@
 package com.untis.database.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import java.time.LocalDateTime
 
 /**
@@ -48,6 +50,11 @@ class AnnouncementMessageEntity(
         joinColumns = [JoinColumn(name = "announcement_id")],
         inverseJoinColumns = [JoinColumn(name = "user_id")]
     )
-    var readBy: List<UserEntity>? = null
+    var readBy: List<UserEntity>? = null,
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "message_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    var author: UserEntity? = null
 
 )

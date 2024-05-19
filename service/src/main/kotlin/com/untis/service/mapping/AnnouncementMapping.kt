@@ -12,6 +12,7 @@ fun createAnnouncementMessageEntity(
     recipients: List<GroupEntity>,
     confirmedBy: List<UserEntity>,
     readBy: List<UserEntity>,
+    author: UserEntity
 ) = AnnouncementMessageEntity(
     id = model.id,
     title = model.title,
@@ -20,7 +21,8 @@ fun createAnnouncementMessageEntity(
     needsConfirmation = model.needsConfirmation,
     recipients = recipients,
     confirmedBy = confirmedBy,
-    readBy = readBy
+    readBy = readBy,
+    author = author
 )
 
 fun createAnnouncementMessageModel(entity: AnnouncementMessageEntity) = AnnouncementMessage(

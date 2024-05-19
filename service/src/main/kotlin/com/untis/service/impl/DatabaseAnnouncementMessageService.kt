@@ -7,6 +7,7 @@ import com.untis.database.repository.GroupRepository
 import com.untis.database.repository.UserRepository
 import com.untis.model.AnnouncementMessage
 import com.untis.model.Group
+import com.untis.model.User
 import com.untis.service.AnnouncementMessageService
 import com.untis.service.GroupService
 import com.untis.service.mapping.createAnnouncementMessageEntity
@@ -90,14 +91,25 @@ internal class DatabaseAnnouncementMessageService @Autowired constructor(
             createUserModel(user, perms)
         }
 
+    override fun getAuthorFor(id: Long): User {
+        val entity = messageRepository.findById(id).get().author!!
+        val perms = groupService.getMergedPermissions(entity.groups!!.map { it.id!! })
+
+        return createUserModel(
+            entity = entity,
+            permissions = perms
+        )
+    }
+
     override fun update(message: AnnouncementMessage): AnnouncementMessage {
         if (!existsById(message.id!!)) throw IllegalArgumentException("Message with '${message.id}' not found")
 
         val readBy = messageRepository.findById(message.id!!).get().readBy!!
         val confirmedBy = messageRepository.findById(message.id!!).get().confirmedBy!!
         val recipients = messageRepository.findById(message.id!!).get().recipients!!
+        val author = messageRepository.findById(message.id!!).get().author!!
 
-        val entity = createAnnouncementMessageEntity(message, recipients, readBy, confirmedBy)
+        val entity = createAnnouncementMessageEntity(message, recipients, readBy, confirmedBy, author)
 
         return messageRepository
             .save(entity)
@@ -150,11 +162,13 @@ internal class DatabaseAnnouncementMessageService @Autowired constructor(
 
     override fun create(
         message: AnnouncementMessage,
-        recipientGroups: List<Long>
+        recipientGroups: List<Long>,
+        author: User
     ): AnnouncementMessage {
         val groups = recipientGroups.map { groupRepository.findById(it).get() }
+        val author = userRepository.findById(author.id!!).get()
 
-        val entity = createAnnouncementMessageEntity(message, groups, emptyList(), emptyList())
+        val entity = createAnnouncementMessageEntity(message, groups, emptyList(), emptyList(), author)
             .let(messageRepository::save)
 
         return createAnnouncementMessageModel(entity)

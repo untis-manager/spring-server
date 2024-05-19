@@ -18,11 +18,13 @@ interface AnnouncementMessageService : BaseService<AnnouncementMessage> {
      *
      * @param message The message
      * @param recipientGroups The groups the message is sent to
+     * @param author The user that created the message
      * @return The created message
      */
     fun create(
         message: AnnouncementMessage,
-        recipientGroups: List<Long>
+        recipientGroups: List<Long>,
+        author: User
     ): AnnouncementMessage
 
     /**
@@ -86,6 +88,14 @@ interface AnnouncementMessageService : BaseService<AnnouncementMessage> {
      * @return All users that have confirmed the message
      */
     fun getConfirmedBy(id: Long): List<User>
+
+    /**
+     * Gets the author for a specific message
+     *
+     * @param id The id of the message
+     * @return The author of the message
+     */
+    fun getAuthorFor(id: Long): User
 
     /**
      * Updates a specific message

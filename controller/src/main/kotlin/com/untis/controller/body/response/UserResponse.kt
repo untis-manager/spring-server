@@ -1,7 +1,11 @@
 package com.untis.controller.body.response
 
+import com.untis.controller.body.parameter.UserRequestModeParameter
+import com.untis.model.Permission
 import com.untis.model.User
 import com.untis.service.mapping.mapToString
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 
 data class FullUserResponse(
 
@@ -60,5 +64,21 @@ data class PartialUserResponse(
         }
 
     }
+}
 
+fun createUserResponse(
+    user: User,
+    mode: UserRequestModeParameter,
+    userPerms: Permission.Users
+): ResponseEntity<Any> = when (mode) {
+    UserRequestModeParameter.Partial -> {
+        if(Permission.Users.Partial.matches(userPerms))
+            ResponseEntity.ok(PartialUserResponse.create(user))
+        else ResponseEntity(HttpStatus.UNAUTHORIZED)
+    }
+    UserRequestModeParameter.Full -> {
+        if(Permission.Users.Full.matches(userPerms))
+            ResponseEntity.ok(FullUserResponse.create(user))
+        else ResponseEntity(HttpStatus.UNAUTHORIZED)
+    }
 }
