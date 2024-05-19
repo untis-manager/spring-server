@@ -94,7 +94,7 @@ internal class DatabaseUserService @Autowired constructor(
         val entity = createUserEntity(
             model = user,
             groupEntities = setOf(group)
-        )
+        ).let(userRepository::save)
 
         return createUserModel(entity, permissions)
     }

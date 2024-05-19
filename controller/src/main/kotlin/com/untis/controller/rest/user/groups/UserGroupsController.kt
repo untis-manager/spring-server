@@ -58,13 +58,14 @@ class UserGroupsController @Autowired constructor(
      * @param user The authenticated user
      * @return The group hierarchy
      */
-    @GetMapping("/hierarchy")
+    @GetMapping("/hierarchy/")
     fun getGroupsHierarchy(
         @AuthenticationPrincipal user: User,
     ): List<GroupHierarchyElement> {
         val directGroups = groupService.getAllForUser(user.id!!)
         val eachParents = directGroups.map { group ->
-            group to groupService.getParentGroups(group.id!!)
+            val parents = groupService.getParentGroups(group.id!!)
+            group to parents.subList(1, parents.size)
         }
 
         val elements = eachParents.map { pair ->

@@ -17,25 +17,25 @@ class GroupPermissionsEntity (
     Permissions
      */
 
-    @Column(name = "permission_users", nullable = false)
+    @Column(name = "permission_users", nullable = true)
     var permissionUsers: Int? = null,
 
-    @Column(name = "permission_profile", nullable = false)
+    @Column(name = "permission_profile", nullable = true)
     var permissionProfile: Int? = null,
 
-    @Column(name = "permission_roles", nullable = false)
+    @Column(name = "permission_roles", nullable = true)
     var permissionRoles: Int? = null,
 
-    @Column(name = "permission_courses", nullable = false)
+    @Column(name = "permission_courses", nullable = true)
     var permissionCourses: Int? = null,
 
-    @Column(name = "permission_groups", nullable = false)
+    @Column(name = "permission_groups", nullable = true)
     var permissionGroups: Int? = null,
 
-    @Column(name = "permission_server_settings", nullable = false)
+    @Column(name = "permission_server_settings", nullable = true)
     var permissionServerSettings: Int? = null,
 
-    @Column(name = "permission_announcements", nullable = false)
+    @Column(name = "permission_announcements", nullable = true)
     var permissionAnnouncements: Int? = null
 
 )

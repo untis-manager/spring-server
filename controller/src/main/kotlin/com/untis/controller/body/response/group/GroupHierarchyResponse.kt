@@ -6,7 +6,7 @@ data class GroupHierarchyElement (
 
     val group: GroupResponse,
 
-    val children: List<GroupResponse>
+    val parents: List<GroupResponse>
 
 ) {
 

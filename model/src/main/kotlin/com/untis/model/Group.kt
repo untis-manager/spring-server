@@ -20,8 +20,8 @@ data class Group(
      * The permissions configured for this group.
      *
      * This does NOT refer to the permissions that a user is given being part of this group.
-     * These may be overwritten by permissions of a parent group.
+     * These may be overwritten by permissions of a child group.
      */
-    val permissions: PermissionsBundle
+    val permissions: PartialPermissionsBundle
 
 )

@@ -90,17 +90,23 @@ internal class DatabaseGroupService @Autowired constructor(
             .toSet()
 
     override fun getMergedPermissions(id: Long): PermissionsBundle {
-        var group: GroupEntity? = groupRepository.findById(id).get()
-        var permissionBundle = createPermissionBundleModel(group!!.permissions!!)
+        val allGroups = groupRepository.getParentGroups(id) // In order: group, parent1, parent2, etc...
+        val iter = allGroups.iterator()
 
-        while (group != null) {
-            val newPermissionBundle = createPermissionBundleModel(group.permissions!!)
-            permissionBundle = permissionBundle.mergeWith(newPermissionBundle)
+        var partialBundle = createPartialPermissionBundleModel(iter.next().permissions!!)
 
-            group = group.parentGroup
+        while(iter.hasNext()) {
+            val nextBundle = createPartialPermissionBundleModel(iter.next().permissions!!)
+
+            // We start from child upwards to parent, so to prioritize children permissions, we pass 'partialBundle' as 'other'
+            partialBundle = nextBundle.mergeWith(partialBundle)
         }
 
-        return permissionBundle
+        if(!partialBundle.isFullBundle()) {
+            throw IllegalStateException("Could not create a full permission bundle for group with id = $id as some fields would be unset.")
+        }
+
+        return partialBundle.toFullBundle()
     }
 
     override fun getMergedPermissions(ids: List<Long>): PermissionsBundle {

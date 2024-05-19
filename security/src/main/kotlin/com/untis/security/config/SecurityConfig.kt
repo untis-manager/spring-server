@@ -95,7 +95,7 @@ private fun Configurer.configureUser(): Configurer =
         .requestMatchers(HttpMethod.GET, "/user/").hasAnyAuthority(*profile(Permission.Profile.Read))
         .requestMatchers(HttpMethod.PATCH, "/user/email/").hasAnyAuthority(*profile(Permission.Profile.Edit))
         .requestMatchers(HttpMethod.PATCH, "/user/password/").hasAnyAuthority(*profile(Permission.Profile.Edit))
-        .requestMatchers(HttpMethod.GET, "/user/role/").hasAnyAuthority(*role(Permission.Scoped.Own))
+        .requestMatchers(HttpMethod.GET, "/user/permissions/").hasAnyAuthority(*role(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/courses/").hasAnyAuthority(*courses(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/courses/{id}/").hasAnyAuthority(*courses(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/courses/{id}/groups/").hasAnyAuthority(*groups(Permission.Scoped.Own))
