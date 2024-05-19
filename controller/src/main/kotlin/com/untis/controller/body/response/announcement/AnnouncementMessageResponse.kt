@@ -1,6 +1,7 @@
 package com.untis.controller.body.response.announcement
 
 import com.untis.model.AnnouncementMessage
+import java.time.LocalDateTime
 
 data class AnnouncementMessageResponse (
 
@@ -10,7 +11,9 @@ data class AnnouncementMessageResponse (
 
     val content: String,
 
-    val needsConfirmation: Boolean
+    val needsConfirmation: Boolean,
+
+    val date: LocalDateTime
 
 ) {
 
@@ -20,7 +23,8 @@ data class AnnouncementMessageResponse (
             id = model.id!!,
             title = model.title,
             content = model.content,
-            needsConfirmation = model.needsConfirmation
+            needsConfirmation = model.needsConfirmation,
+            date = model.dateSent
         )
 
     }
