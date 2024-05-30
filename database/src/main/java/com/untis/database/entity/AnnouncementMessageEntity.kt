@@ -28,6 +28,7 @@ class AnnouncementMessageEntity(
     @Column(name = "needs_confirmation", nullable = false)
     var needsConfirmation: Boolean? = null,
 
+    // TODO: Should be 'group_id' not 'user_id'
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "announcement_recipients",
@@ -52,6 +53,7 @@ class AnnouncementMessageEntity(
     )
     var readBy: List<UserEntity>? = null,
 
+    //TODO: Should be 'user_id' not 'message_id'
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "message_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
