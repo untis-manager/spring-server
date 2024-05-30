@@ -107,7 +107,7 @@ class UserAnnouncementController @Autowired constructor(
      * @return The author it was sent to
      */
     @GetMapping("{id}/author/")
-    fun getMessageGroups(
+    fun getMessageAuthor(
         @AuthenticationPrincipal user: User,
         @RequestParam mode: UserRequestModeParameter,
         @PathVariable id: Long
@@ -116,11 +116,12 @@ class UserAnnouncementController @Autowired constructor(
 
         val author = announcementMessageService.getAuthorFor(id)
 
-        return createUserResponse(
+        val r =  createUserResponse(
             user = author,
             mode = mode,
             userPerms = user.permissions.users
         )
+        return r
     }
 
     /**
