@@ -1,4 +1,4 @@
-package com.untis.application
+package com.untis
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = ["com.untis.database"])
-@ComponentScan(basePackages = ["com.untis"])
 @EntityScan("com.untis.database")
 class UntisCloneServerApplication
 

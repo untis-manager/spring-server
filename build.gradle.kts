@@ -8,7 +8,7 @@ plugins {
     id("org.jetbrains.kotlinx.kover") version "0.7.6"
 }
 
-group = "com.untis.application"
+group = "com.untis"
 version = "unspecified"
 
 repositories {
