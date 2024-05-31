@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: 'jdbc:postgresql://localhost:5432/untis-db'
+    username: 'admin'
+    password: 'admin'
+    driver-class-name: 'org.postgresql.Driver'
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
