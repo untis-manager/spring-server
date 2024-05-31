@@ -30,7 +30,7 @@ class AnnouncementsController @Autowired constructor(
 
         val model = AnnouncementAttachmentMeta(
             id = null,
-            filename = attachmentFile.name,
+            filename = attachmentFile.originalFilename ?: attachmentFile.name,
             size = attachmentFile.size
         ).let {
             announcementAttachmentService.create(it, id, attachmentFile)
