@@ -10,3 +10,13 @@ logging:
     org:
       springframework:
         security: DEBUG
+
+untis:
+  admin:
+    secret: '6fabbea5-6954-49da-a5ed-eb7735a98712'
+  auth:
+    jwt:
+      secret: 'ab0ff415-7882-4175-8547-1f70add85d8b'
+      expiration: '3600000'
+  io:
+    attachments: '/home/simon/Untis-Clone/attachments/'
