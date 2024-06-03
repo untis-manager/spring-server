@@ -108,6 +108,8 @@ private fun Configurer.configureUser(): Configurer =
         .requestMatchers(HttpMethod.GET, "/user/announcements/").hasAnyAuthority(*announcements(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/announcements/{id}/")
         .hasAnyAuthority(*announcements(Permission.Scoped.Own))
+        .requestMatchers(HttpMethod.PUT, "/user/announcements/{id}/")
+        .hasAnyAuthority(*announcements(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/announcements/{id}/groups/")
         .hasAnyAuthority(*groups(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/announcements/{id}/author/").permitAll() // Handled in controller

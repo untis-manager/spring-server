@@ -1,11 +1,14 @@
 package com.untis.controller.rest.user.announcements
 
 import com.untis.controller.base.ControllerScope
+import com.untis.controller.body.parameter.MessageMarkParameter
 import com.untis.controller.body.parameter.UserRequestModeParameter
 import com.untis.controller.body.response.announcement.AnnouncementAttachmentResponse
 import com.untis.controller.body.response.announcement.UserAnnouncementMessageResponse
 import com.untis.controller.body.response.createUserResponse
 import com.untis.controller.body.response.group.GroupResponse
+import com.untis.controller.util.conflict
+import com.untis.controller.util.ok
 import com.untis.controller.validating.validateAnnouncementMessageExists
 import com.untis.model.User
 import com.untis.model.exception.RequestException
@@ -81,6 +84,55 @@ class UserAnnouncementController @Autowired constructor(
     }
 
     /**
+     * Marks a message according to the [status]
+     *
+     * @param user The authenticated user
+     * @param id The path variable id of the message
+     * @param status What the message should be marked as
+     * @return The announcement message
+     */
+    @Suppress("DuplicatedCode")
+    @PutMapping("{id}/")
+    fun mark(
+        @AuthenticationPrincipal user: User,
+        @PathVariable id: Long,
+        @RequestParam status: MessageMarkParameter
+    ): ResponseEntity<UserAnnouncementMessageResponse> {
+        validateAnnouncementMessageExists(id, user.id!!)
+
+        val msg = announcementMessageService
+            .getById(id)
+
+        when (status) {
+            MessageMarkParameter.Read -> {
+                val readBy = announcementMessageService.getReadBy(id).map { it.id!! }
+                if (user.id!! in readBy) return conflict()
+                announcementMessageService.updateReadBy(id, readBy + user.id!!)
+            }
+
+            MessageMarkParameter.Confirmed -> {
+                val confirmedBy = announcementMessageService.getConfirmedBy(id).map { it.id!! }
+                if (user.id!! in confirmedBy || !msg.needsConfirmation) return conflict()
+                announcementMessageService.updateConfirmedBy(id, confirmedBy + user.id!!)
+            }
+        }
+
+        val response = announcementMessageService
+            .getById(id).let {
+                val confirmed = announcementMessageService.getConfirmedBy(it.id!!).map { it.id!! }
+                val read = announcementMessageService.getReadBy(it.id!!).map { it.id!! }
+
+                UserAnnouncementMessageResponse.create(
+                    model = it,
+                    confirmedByUser = user.id!! in confirmed,
+                    readByUser = user.id!! in read
+                )
+            }
+
+        return ok(response)
+    }
+
+    /**
      * Returns the groups a specific announcement message was sent to
      *
      * @param user The authenticated user
@@ -116,7 +168,7 @@ class UserAnnouncementController @Autowired constructor(
 
         val author = announcementMessageService.getAuthorFor(id)
 
-        val r =  createUserResponse(
+        val r = createUserResponse(
             user = author,
             mode = mode,
             userPerms = user.permissions.users
