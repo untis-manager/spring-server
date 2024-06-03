@@ -67,7 +67,7 @@ internal class UserSecurityServiceImpl @Autowired constructor(
     override fun verifyUserCredentials(email: String, password: String): User? = userService
         .getByEmail(email)
         .let { user ->
-            val valid = user?.encodedPassword == passwordEncoder.encode(password)
+            val valid = passwordEncoder.matches(password, user?.encodedPassword ?: "")
 
             if (!valid || user == null) null
             else user
