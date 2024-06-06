@@ -87,7 +87,7 @@ internal class UserSecurityServiceImpl @Autowired constructor(
         val isValid = secToken.expirationDate.isAfter(LocalDateTime.now()) &&
                 !secToken.used &&
                 secToken.additionalInfo != null &&
-                secToken.tokenType == SecurityTokenType.ResetPassword &&
+                secToken.tokenType == SecurityTokenType.ResetEmail &&
                 user != null &&
                 user.permissions.profile.matches(Permission.Profile.Edit)
 
