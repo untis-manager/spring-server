@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.untis"
-version = "0.0.1-SNAPSHOT"
+version = "unspecified"
 
 repositories {
     mavenCentral()

@@ -15,13 +15,15 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 /**
  * The rest endpoint that handles interactions of a user with their account and related security measures,
  *      such as resetting the email, changing the password or deleting the account
  */
-@RestController("/user/")
+@RestController
+@RequestMapping("/user/")
 class PersonalSecurityController @Autowired constructor(
 
     override val tokenService: SecurityTokenService,

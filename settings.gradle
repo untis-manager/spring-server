@@ -4,7 +4,6 @@ plugins {
 rootProject.name = 'untis-server'
 
 include 'database'
-include 'application'
 include 'model'
 include 'mail'
 include 'common'

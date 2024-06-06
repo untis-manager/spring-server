@@ -8,8 +8,8 @@ plugins {
     id("org.jetbrains.kotlinx.kover") version "0.7.6"
 }
 
-group = "com.untis"
-version = "0.0.1-SNAPSHOT"
+group = "com.untis.security"
+version = "unspecified"
 
 repositories {
     mavenCentral()
@@ -46,4 +46,11 @@ tasks.test {
 
 kotlin {
     jvmToolchain(19)
+}
+
+tasks.bootJar {
+    enabled = false
+}
+tasks.jar {
+    enabled = true
 }

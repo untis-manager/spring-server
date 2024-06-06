@@ -2,8 +2,8 @@ plugins {
     kotlin("jvm") version "1.9.23"
 }
 
-group = "com.untis"
-version = "0.0.1-SNAPSHOT"
+group = "com.untis.common"
+version = "unspecified"
 
 repositories {
     mavenCentral()

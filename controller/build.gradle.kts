@@ -6,7 +6,7 @@ plugins {
     id("org.jetbrains.kotlinx.kover") version "0.7.6"
 }
 
-group = "com.untis"
+group = "com.untis.controller"
 version = "unspecified"
 
 repositories {
@@ -34,4 +34,11 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(19)
+}
+
+tasks.bootJar {
+    enabled = false
+}
+tasks.jar {
+    enabled = true
 }

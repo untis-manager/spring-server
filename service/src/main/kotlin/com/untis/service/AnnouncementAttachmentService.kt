@@ -4,7 +4,6 @@ import com.untis.model.AnnouncementAttachmentMeta
 import com.untis.service.base.BaseService
 import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
-import java.io.InputStream
 
 /**
  * Service to perform operations on announcement messages.

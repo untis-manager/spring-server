@@ -18,6 +18,6 @@ class TestController @Autowired constructor(
     @GetMapping("{id}/")
     fun test(
         @PathVariable id: Long
-    ) = groupService.getUsers(id)
+    ) = (id * 10).toString()
 
 }

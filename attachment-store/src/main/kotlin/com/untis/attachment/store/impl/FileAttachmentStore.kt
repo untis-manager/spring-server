@@ -3,6 +3,7 @@
 package com.untis.attachment.store.impl
 
 import com.untis.attachment.store.AttachmentStore
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.FileSystemResource
@@ -19,12 +20,17 @@ internal class FileAttachmentStore @Autowired constructor(
 
 ) : AttachmentStore {
 
+    private val logger = LoggerFactory.getLogger(FileAttachmentStore::class.java)
+
     @Suppress("JoinDeclarationAndAssignment")
     private lateinit var root: File
 
     init {
         root = File(path)
-        if (!root.exists()) root.mkdirs()
+        logger.info("Path {} resulted in the absolute path {}", path, root.absolutePath)
+        if (!root.exists()) {
+            root.mkdirs()
+        }
     }
 
     override fun save(file: MultipartFile, id: Long) = save(file.bytes, id)

@@ -4,11 +4,6 @@ import com.untis.model.Permission
 import com.untis.security.auth.JwtFilter
 import com.untis.security.auth.UntisUserDetailsService
 import com.untis.security.config.authority.*
-import com.untis.security.config.authority.courses
-import com.untis.security.config.authority.groups
-import com.untis.security.config.authority.profile
-import com.untis.security.config.authority.role
-import com.untis.security.config.authority.serverSettings
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -53,7 +48,7 @@ class SecurityConfig @Autowired constructor(
                 .configureAuth()
                 .configureServerSettings()
                 .configureUser()
-
+                .configureAnnouncements()
         }
         .sessionManagement {
             it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -76,6 +71,12 @@ class SecurityConfig @Autowired constructor(
 
 private typealias Configurer = AuthorizeHttpRequestsConfigurer<*>.AuthorizationManagerRequestMatcherRegistry
 
+private fun Configurer.configureAnnouncements(): Configurer =
+    requestMatchers(
+        HttpMethod.POST,
+        "/announcements/{id}/attachments/"
+    ).hasAnyAuthority(*announcements(Permission.Scoped.Edit))
+
 private fun Configurer.configureAuth(): Configurer =
     requestMatchers("/auth/validate/**").permitAll()
         .requestMatchers("/auth/signup/**").permitAll()
@@ -93,8 +94,8 @@ private fun Configurer.configureUser(): Configurer =
     requestMatchers(HttpMethod.PATCH, "/user/").hasAnyAuthority(*profile(Permission.Profile.Edit))
         .requestMatchers(HttpMethod.DELETE, "/user/").hasAnyAuthority(*profile(Permission.Profile.Edit))
         .requestMatchers(HttpMethod.GET, "/user/").hasAnyAuthority(*profile(Permission.Profile.Read))
-        .requestMatchers(HttpMethod.PATCH, "/user/email/").hasAnyAuthority(*profile(Permission.Profile.Edit))
-        .requestMatchers(HttpMethod.PATCH, "/user/password/").hasAnyAuthority(*profile(Permission.Profile.Edit))
+        .requestMatchers(HttpMethod.PATCH ,"/user/email/").permitAll()
+        .requestMatchers(HttpMethod.PATCH ,"/user/password/").permitAll()
         .requestMatchers(HttpMethod.GET, "/user/permissions/").hasAnyAuthority(*role(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/courses/").hasAnyAuthority(*courses(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/courses/{id}/").hasAnyAuthority(*courses(Permission.Scoped.Own))
@@ -105,12 +106,19 @@ private fun Configurer.configureUser(): Configurer =
         .requestMatchers(HttpMethod.GET, "/user/groups/{id}/courses/").hasAnyAuthority(*courses(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/groups/{id}/users/").permitAll() // Handled in controller
         .requestMatchers(HttpMethod.GET, "/user/announcements/").hasAnyAuthority(*announcements(Permission.Scoped.Own))
-        .requestMatchers(HttpMethod.GET, "/user/announcements/{id}/").hasAnyAuthority(*announcements(Permission.Scoped.Own))
-        .requestMatchers(HttpMethod.GET, "/user/announcements/{id}/groups/").hasAnyAuthority(*groups(Permission.Scoped.Own))
+        .requestMatchers(HttpMethod.GET, "/user/announcements/{id}/")
+        .hasAnyAuthority(*announcements(Permission.Scoped.Own))
+        .requestMatchers(HttpMethod.PUT, "/user/announcements/{id}/")
+        .hasAnyAuthority(*announcements(Permission.Scoped.Own))
+        .requestMatchers(HttpMethod.GET, "/user/announcements/{id}/groups/")
+        .hasAnyAuthority(*groups(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/announcements/{id}/author/").permitAll() // Handled in controller
-        .requestMatchers(HttpMethod.GET, "/user/announcements/{id}/attachments/").hasAnyAuthority(*announcements(Permission.Scoped.Own))
-        .requestMatchers(HttpMethod.GET, "/user/announcements/{messageId}/attachments/{attachmentId}/").hasAnyAuthority(*announcements(Permission.Scoped.Own))
-        .requestMatchers(HttpMethod.GET, "/user/announcements/{messageId}/attachments/{attachmentId}/file/").hasAnyAuthority(*announcements(Permission.Scoped.Own))
+        .requestMatchers(HttpMethod.GET, "/user/announcements/{id}/attachments/")
+        .hasAnyAuthority(*announcements(Permission.Scoped.Own))
+        .requestMatchers(HttpMethod.GET, "/user/announcements/{messageId}/attachments/{attachmentId}/")
+        .hasAnyAuthority(*announcements(Permission.Scoped.Own))
+        .requestMatchers(HttpMethod.GET, "/user/announcements/{messageId}/attachments/{attachmentId}/file/")
+        .hasAnyAuthority(*announcements(Permission.Scoped.Own))
 
 
 
