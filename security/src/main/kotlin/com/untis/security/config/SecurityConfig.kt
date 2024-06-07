@@ -86,16 +86,15 @@ private fun Configurer.configureAuth(): Configurer =
 
 private fun Configurer.configureServerSettings(): Configurer =
     requestMatchers(HttpMethod.GET, "/server-config/signup-mode/").permitAll()
-        .requestMatchers(HttpMethod.POST, "/server-config/signup-mode/")
-        .hasAnyAuthority(*serverSettings(Permission.Simple.Write))
+        .requestMatchers(HttpMethod.POST, "/server-config/signup-mode/").hasAnyAuthority(*serverSettings(Permission.Simple.Write))
 
 
 private fun Configurer.configureUser(): Configurer =
     requestMatchers(HttpMethod.PATCH, "/user/").hasAnyAuthority(*profile(Permission.Profile.Edit))
         .requestMatchers(HttpMethod.DELETE, "/user/").hasAnyAuthority(*profile(Permission.Profile.Edit))
         .requestMatchers(HttpMethod.GET, "/user/").hasAnyAuthority(*profile(Permission.Profile.Read))
-        .requestMatchers(HttpMethod.PATCH ,"/user/email/").permitAll()
-        .requestMatchers(HttpMethod.PATCH ,"/user/password/").permitAll()
+        .requestMatchers(HttpMethod.PATCH, "/user/email/").permitAll()
+        .requestMatchers(HttpMethod.PATCH, "/user/password/").permitAll()
         .requestMatchers(HttpMethod.GET, "/user/permissions/").hasAnyAuthority(*role(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/courses/").hasAnyAuthority(*courses(Permission.Scoped.Own))
         .requestMatchers(HttpMethod.GET, "/user/courses/{id}/").hasAnyAuthority(*courses(Permission.Scoped.Own))
