@@ -36,7 +36,7 @@ class ValidateAuthController @Autowired constructor(
      * @param requestBody The request body with the email and the token to check against
      * @return Whether the token is valid or not
      */
-    @PostMapping("/email-token")
+    @PostMapping("/email-token/")
     fun verifyEmailToken(
         @RequestBody requestBody: VerifyEmailTokenRequest
     ): VerifyResponse {
@@ -58,7 +58,7 @@ class ValidateAuthController @Autowired constructor(
      * @param requestBody The request body with the email to check
      * @return Whether the email is still free or not
      */
-    @PostMapping("/email")
+    @PostMapping("/email/")
     fun verifyEmail(
         @RequestBody requestBody: VerifyEmailRequest
     ): VerifyResponse {
@@ -73,7 +73,7 @@ class ValidateAuthController @Autowired constructor(
      * @return The request body with the secret
      * @return Whether the secret is valid or not
      */
-    @PostMapping("/secret")
+    @PostMapping("/secret/")
     fun verifySecret(
         @RequestBody requestBody: VerifySecretRequest
     ): VerifyResponse = VerifyResponse(requestBody.secret == secret)
