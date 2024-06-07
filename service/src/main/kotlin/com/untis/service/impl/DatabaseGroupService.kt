@@ -59,9 +59,9 @@ internal class DatabaseGroupService @Autowired constructor(
 
     override fun getUsers(id: Long): Set<User> {
         val groups = groupRepository.getChildrenGroups(id)
-        val usersPerGroup = groups.map { userRepository.getUsersInGroups(listOf(it.id!!)) }
+        val ids = groups.map { it.id!! } + id
+        val usersPerGroup = userRepository.getUsersInGroups(ids)
         return usersPerGroup
-            .flatten()
             .distinctBy { it.id!! }
             .map { user ->
                 val perms = getMergedPermissions(user.groups!!.map { it.id!! })
