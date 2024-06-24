@@ -72,12 +72,12 @@ fun createUserResponse(
     userPerms: Permission.Users
 ): ResponseEntity<Any> = when (mode) {
     UserRequestModeParameter.Partial -> {
-        if(Permission.Users.Partial.matches(userPerms))
+        if(userPerms.satisfies(Permission.Users.Partial))
             ResponseEntity.ok(PartialUserResponse.create(user))
         else ResponseEntity(HttpStatus.UNAUTHORIZED)
     }
     UserRequestModeParameter.Full -> {
-        if(Permission.Users.Full.matches(userPerms))
+        if(userPerms.satisfies(Permission.Users.Partial))
             ResponseEntity.ok(FullUserResponse.create(user))
         else ResponseEntity(HttpStatus.UNAUTHORIZED)
     }

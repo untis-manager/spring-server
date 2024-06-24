@@ -52,7 +52,7 @@ internal class UserSecurityServiceImpl @Autowired constructor(
                 secToken.tokenType == SecurityTokenType.ResetPassword &&
                 secToken.additionalInfo != null &&
                 user != null &&
-                user.permissions.profile.matches(Permission.Profile.Edit)
+                user.permissions.profile.satisfies(Permission.Profile.Edit)
 
         if (!isValid) return false
 
@@ -89,7 +89,7 @@ internal class UserSecurityServiceImpl @Autowired constructor(
                 secToken.additionalInfo != null &&
                 secToken.tokenType == SecurityTokenType.ResetEmail &&
                 user != null &&
-                user.permissions.profile.matches(Permission.Profile.Edit)
+                user.permissions.profile.satisfies(Permission.Profile.Edit)
 
         if (!isValid) return false
 

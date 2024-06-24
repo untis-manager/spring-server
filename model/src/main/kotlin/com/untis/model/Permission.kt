@@ -180,14 +180,14 @@ sealed class Permission(
     }
 
     /**
-     * Checks whether this permission is enough to satisfy the [other]
+     * Checks whether this permission is enough to satisfy the [needed]
      *
-     * @param other The needed permission
+     * @param needed The needed permission
      * @return Whether this permission is enough to satisfy the needed permission
      */
-    fun matches(other: Permission): Boolean {
-        if (other.type != this.type) throw IllegalArgumentException("Cannot compare different permission types '${other.type}' and '${this.type}'")
-        return this.stage >= other.stage
+    fun satisfies(needed: Permission): Boolean {
+        if (needed.type != this.type) throw IllegalArgumentException("Cannot compare different permission types '${needed.type}' and '${this.type}'")
+        return this.stage >= needed.stage
     }
 
     /**
