@@ -4,13 +4,20 @@ import com.untis.controller.base.ControllerScope
 import com.untis.controller.body.request.settings.UpdateSignUpModeRequest
 import com.untis.controller.body.response.SignUpModeResponse
 import com.untis.controller.body.response.config.OrganizationNameResponse
+import com.untis.controller.util.internalError
+import com.untis.controller.util.ok
 import com.untis.controller.validating.validateGroupExists
 import com.untis.model.SignUpMode
 import com.untis.model.exception.RequestException
 import com.untis.service.GroupService
 import com.untis.service.ServerSettingsService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.io.File
 
 /**
  * Access to the server settings
@@ -21,7 +28,10 @@ class ServerSettingsController @Autowired constructor(
 
     val serverSettingsService: ServerSettingsService,
 
-    override val groupService: GroupService
+    override val groupService: GroupService,
+
+    @Value("\${untis.icon}")
+    private val iconPath: String
 
 ) : ControllerScope() {
 
@@ -44,6 +54,22 @@ class ServerSettingsController @Autowired constructor(
     fun organizationName(): OrganizationNameResponse = serverSettingsService
         .get().organizationName
         .let(OrganizationNameResponse::create)
+
+    /**
+     * Endpoint that returns the icon set by an admin as a multipart file.
+     *
+     * @return The file as a [Resource]
+     */
+    @GetMapping("/organization-icon/")
+    fun organizationIcon(): ResponseEntity<Resource> {
+        val iconFile = File(iconPath)
+
+        return if(iconFile.exists()) {
+            ok(FileSystemResource(iconFile))
+        } else {
+            internalError()
+        }
+    }
 
     /**
      * Endpoint that changes the currently active sign up mode

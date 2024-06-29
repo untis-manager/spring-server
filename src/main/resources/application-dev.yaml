@@ -20,3 +20,4 @@ untis:
       expiration: '3600000'
   io:
     attachments: '/home/simon/Untis-Clone/attachments/'
+  icon: '/home/simon/Untis-Clone/Icon.png'

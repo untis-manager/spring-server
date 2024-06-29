@@ -7,6 +7,8 @@ fun <T> unauthorized() = ResponseEntity<T>(HttpStatus.UNAUTHORIZED)
 
 fun <T> ok(t: T) = ResponseEntity(t, HttpStatus.OK)
 
+fun <T> internalError() = ResponseEntity<T>(HttpStatus.INTERNAL_SERVER_ERROR)
+
 fun <T> conflict() = ResponseEntity<T>(HttpStatus.CONFLICT)
 
 fun <T> notFound() = ResponseEntity<T>(HttpStatus.NOT_FOUND)
