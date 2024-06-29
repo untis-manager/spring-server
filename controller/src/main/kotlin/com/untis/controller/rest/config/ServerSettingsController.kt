@@ -3,6 +3,7 @@ package com.untis.controller.rest.config
 import com.untis.controller.base.ControllerScope
 import com.untis.controller.body.request.settings.UpdateSignUpModeRequest
 import com.untis.controller.body.response.SignUpModeResponse
+import com.untis.controller.body.response.config.OrganizationNameResponse
 import com.untis.controller.validating.validateGroupExists
 import com.untis.model.SignUpMode
 import com.untis.model.exception.RequestException
@@ -33,6 +34,16 @@ class ServerSettingsController @Autowired constructor(
     fun signUpMode(): SignUpModeResponse = serverSettingsService
         .get().signUpMode
         .let(SignUpModeResponse::create)
+
+    /**
+     * Endpoint that returns the name of the organization
+     *
+     * @return The name
+     */
+    @GetMapping("/organization-name/")
+    fun organizationName(): OrganizationNameResponse = serverSettingsService
+        .get().organizationName
+        .let(OrganizationNameResponse::create)
 
     /**
      * Endpoint that changes the currently active sign up mode
