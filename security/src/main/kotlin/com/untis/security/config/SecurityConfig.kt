@@ -86,7 +86,10 @@ private fun Configurer.configureAuth(): Configurer =
 
 private fun Configurer.configureServerSettings(): Configurer =
     requestMatchers(HttpMethod.GET, "/server-config/signup-mode/").permitAll()
-        .requestMatchers(HttpMethod.POST, "/server-config/signup-mode/").hasAnyAuthority(*serverSettings(Permission.Simple.Write))
+        .requestMatchers(HttpMethod.GET, "/server-config/organization-name/").permitAll()
+        .requestMatchers(HttpMethod.GET, "/server-config/organization-icon/").permitAll()
+        .requestMatchers(HttpMethod.POST, "/server-config/signup-mode/")
+        .hasAnyAuthority(*serverSettings(Permission.Simple.Write))
 
 
 private fun Configurer.configureUser(): Configurer =

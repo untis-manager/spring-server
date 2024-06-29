@@ -16,7 +16,10 @@ class ServerSettingsEntity(
     var signupFreeDefaultRoleId: Long? = null,
 
     @Column(name = "signup_free_needs_email_verification", nullable = true)
-    var signupFreeNeedsEmailVerification: Boolean? = null
+    var signupFreeNeedsEmailVerification: Boolean? = null,
+
+    @Column(name = "org_name", nullable = false)
+    var organizationName: String? = null
 
 
 )

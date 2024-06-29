@@ -1,4 +1,7 @@
 spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
   datasource:
     url: 'jdbc:postgresql://localhost:5432/untis-db'
     username: 'admin'
@@ -20,3 +23,4 @@ untis:
       expiration: '3600000'
   io:
     attachments: '/home/simon/Untis-Clone/attachments/'
+  icon: '/home/simon/Untis-Clone/Icon.png'

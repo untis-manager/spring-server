@@ -8,7 +8,12 @@ data class ServerSettings(
     /**
      * The mode how users can sign up to the server
      */
-    val signUpMode: SignUpMode
+    val signUpMode: SignUpMode,
+
+    /**
+     * The name of the organization that created this server
+     */
+    val organizationName: String
 
 ) {
 
@@ -18,7 +23,8 @@ data class ServerSettings(
          * The default server settings
          */
         val Default = ServerSettings(
-            signUpMode = SignUpMode.Admin
+            signUpMode = SignUpMode.Admin,
+            organizationName = "Default Organization"
         )
 
     }
